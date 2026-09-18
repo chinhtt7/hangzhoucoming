@@ -467,34 +467,73 @@
             <div id="explanation-box" style="display:none;margin-top:14px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
           </div>
 
-          <!-- TAB 2: GÕ PINYIN -->
+          <!-- TAB 2: GÕ PINYIN (Luyện gõ WeChat thực tế) -->
           <div id="pzone-type" style="display:none;">
-            <div style="margin-bottom:10px;">
-              <div style="font-size:11px;color:var(--text-caption);margin-bottom:4px;font-weight:600;text-transform:uppercase;">Gợi ý phát âm Pinyin:</div>
-              <div id="type-pinyin-hint" style="font-size:13px;color:var(--accent);font-weight:600;"></div>
+            <div style="background:#F8FAFC;border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:14px;">
+              <div style="font-size:11px;color:var(--text-caption);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">ĐỀ BÀI (DỊCH SANG TIẾNG TRUNG):</div>
+              <div id="type-prompt-vi" style="font-size:15px;font-weight:600;color:var(--text-primary);line-height:1.4;"></div>
             </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:12px;color:var(--text-secondary);">Gõ Pinyin từ bàn phím để chọn chữ Hán:</div>
+              <button type="button" class="btn-ghost" onclick="giveNextPinyinHint()" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px dashed var(--accent);color:var(--accent);font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                <span>💡 Gợi ý Pinyin từ tiếp theo</span>
+              </button>
+            </div>
+
+            <!-- Hint box container -->
+            <div id="type-pinyin-hint-container" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:10px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);">
+              <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">GỢI Ý TỪNG TỪ:</div>
+              <div id="type-revealed-hints" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;"></div>
+            </div>
+
             <div style="display:flex;gap:8px;align-items:center;">
-              <input type="text" id="type-input" class="input-field zh" placeholder="Gõ chữ Hán vào đây..." style="font-size:15px;" onkeydown="if(event.key==='Enter') checkTypeAnswer()">
+              <input type="text" id="type-input" class="input-field zh" placeholder="Gõ chữ Hán vào đây..." style="font-size:16px;" onkeydown="if(event.key==='Enter') checkTypeAnswer()">
               <button class="btn-primary" onclick="checkTypeAnswer()" style="white-space:nowrap;padding:10px 18px;">Kiểm tra</button>
             </div>
             <div id="type-feedback" style="display:none;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
           </div>
 
-          <!-- TAB 3: PHÁT ÂM MIC -->
+          <!-- TAB 3: PHÁT ÂM MIC (Có chuẩn hóa và đối chiếu chi tiết) -->
           <div id="pzone-speech" style="display:none;">
-            <div style="text-align:center;padding:14px 0 10px;">
-              <div class="zh" id="speech-target-text" style="font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:4px;"></div>
-              <div id="speech-target-py" style="font-size:13px;color:var(--accent);margin-bottom:16px;"></div>
+            <!-- Mode switch: Full Sentence vs Core Word Focus -->
+            <div style="display:flex;justify-content:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
+              <button class="pill pill-green" id="speech-mode-sentence" onclick="setSpeechPracticeMode('sentence')" style="cursor:pointer;border:none;">🗣️ Luyện cả câu đích</button>
+              <button class="pill pill-ghost" id="speech-mode-core" onclick="setSpeechPracticeMode('core')" style="cursor:pointer;border:1px solid var(--border);">🎯 Luyện từ trọng tâm (Thử thách chuẩn thanh điệu)</button>
+            </div>
+
+            <div style="text-align:center;padding:8px 0 10px;">
+              <div class="zh" id="speech-target-text" style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:4px;cursor:pointer;" title="Bấm để nghe mẫu" onclick="playCurrentSpeechTarget()"></div>
+              <div id="speech-target-py" style="font-size:14px;color:var(--accent);font-weight:600;margin-bottom:14px;"></div>
               
-              <button id="speech-mic-btn" class="btn-primary" onclick="toggleSpeechRecording()" style="padding:12px 26px;border-radius:999px;font-size:14px;box-shadow:0 4px 14px rgba(22,163,74,0.22);gap:8px;">
-                <i data-lucide="mic" style="width:18px;height:18px;"></i>
-                <span id="speech-btn-label">Bấm để nói (zh-CN)</span>
-              </button>
-              <div id="speech-listening-indicator" style="display:none;font-size:12px;color:var(--accent);font-weight:600;margin-top:10px;">
-                🎙️ Đang lắng nghe giọng của bạn...
+              <div style="display:flex;justify-content:center;gap:10px;align-items:center;">
+                <button id="speech-mic-btn" class="btn-primary" onclick="toggleSpeechRecording()" style="padding:12px 28px;border-radius:999px;font-size:14px;box-shadow:0 4px 14px rgba(22,163,74,0.22);gap:8px;">
+                  <i data-lucide="mic" style="width:18px;height:18px;"></i>
+                  <span id="speech-btn-label">Bấm để nói (zh-CN)</span>
+                </button>
+                <button class="btn-secondary" onclick="playCurrentSpeechTarget()" style="width:42px;height:42px;padding:0;border-radius:999px;" title="Nghe giọng mẫu chuẩn Xiaoxiao">
+                  <i data-lucide="volume-2" style="width:18px;height:18px;"></i>
+                </button>
+              </div>
+
+              <div id="speech-listening-indicator" style="display:none;font-size:13px;color:var(--accent);font-weight:600;margin-top:10px;">
+                🎙️ Đang lắng nghe giọng của bạn... (Hãy nói rõ ràng, dứt khoát)
               </div>
             </div>
+
+            <!-- Result Diagnostic Box -->
             <div id="speech-result-box" style="display:none;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
+
+            <!-- Tone & Phonetic Guide Breakdown -->
+            <div id="speech-tone-guide" style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-caption);letter-spacing:0.04em;">
+                  🔍 BẢN ĐỒ THANH ĐIỆU & ĐIỂM CẦN CHÚ Ý:
+                </span>
+                <span style="font-size:11px;color:var(--text-secondary);">Bấm 🔊 để nghe từng từ</span>
+              </div>
+              <div id="speech-breakdown-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
           </div>
         </div>
 
@@ -1279,31 +1318,127 @@ function handleWarmupRate(word, quality, btn) {
 }
 
 // ==========================================================
+
+const lessonExtras = {
+  1: {
+    hintTokens: [
+      { zh: "今天", py: "jīntiān" },
+      { zh: "我", py: "wǒ" },
+      { zh: "想", py: "xiǎng" },
+      { zh: "跟你", py: "gēn nǐ" },
+      { zh: "一起", py: "yìqǐ" },
+      { zh: "去", py: "qù" },
+      { zh: "吃火锅", py: "chī huǒguō" }
+    ],
+    phonetics: [
+      { word: "今天", py: "jīntiān", tone: "Thanh 1 + Thanh 1", tip: "Đọc cao và bằng phẳng, giữ hơi ổn định.", isCore: false },
+      { word: "想你", py: "xiáng nǐ", tone: "⚠️ Biến điệu hai thanh 3!", tip: "Chữ 想 (xiǎng) đứng trước 你 (nǐ) phải đổi đọc thành thanh 2 (xiáng).", isCore: true },
+      { word: "一起", py: "yìqǐ", tone: "Biến điệu chữ 一!", tip: "Chữ 一 đọc thành thanh 4 (yì) dứt khoát trước qǐ.", isCore: false },
+      { word: "去", py: "qù", tone: "Thanh 4 (Rơi dứt khoát)", tip: "Âm Q bật hơi mạnh ở chân răng, giọng hạ nhanh từ cao xuống thấp.", isCore: false },
+      { word: "吃火锅", py: "chī huǒguō", tone: "chī (uốn lưỡi) + huǒguō", tip: "Đầu lưỡi cong nhẹ lên vòm miệng trên khi phát âm chī.", isCore: false }
+    ]
+  },
+  2: {
+    hintTokens: [
+      { zh: "明天下午", py: "míngtiān xiàwǔ" },
+      { zh: "我", py: "wǒ" },
+      { zh: "和女朋友", py: "hé nǚpéngyou" },
+      { zh: "去", py: "qù" },
+      { zh: "西湖", py: "Xīhú" },
+      { zh: "散步", py: "sànbù" }
+    ],
+    phonetics: [
+      { word: "明天下午", py: "míngtiān xiàwǔ", tone: "Thanh 2 + 1 + 4 + 3", tip: "Cụm chỉ thời gian nói liền mạch, xià rơi nhanh.", isCore: false },
+      { word: "和女朋友", py: "hé nǚpéngyou", tone: "nǚ tròn môi + you thanh nhẹ", tip: "Âm nǚ chu tròn môi giữ nguyên khẩu hình.", isCore: false },
+      { word: "去", py: "qù", tone: "Thanh 4 (Dứt khoát)", tip: "Đi đâu đó - âm Q bật hơi sắc bén.", isCore: true },
+      { word: "西湖", py: "Xīhú", tone: "Thanh 1 + Thanh 2", tip: "Biểu tượng Hàng Châu: Xī bằng phẳng, hú sắc lên.", isCore: false },
+      { word: "散步", py: "sànbù", tone: "Thanh 4 + Thanh 4", tip: "Hai thanh 4 liền nhau, nhấn dứt khoát từng âm.", isCore: false }
+    ]
+  },
+  3: {
+    hintTokens: [
+      { zh: "老板", py: "lǎobǎn" },
+      { zh: "请问", py: "qǐngwèn" },
+      { zh: "这个", py: "zhèige" },
+      { zh: "龙井茶", py: "Lóngjǐngchá" },
+      { zh: "多少钱", py: "duōshao qián" },
+      { zh: "一斤", py: "yì jīn" }
+    ],
+    phonetics: [
+      { word: "老板", py: "láobǎn", tone: "⚠️ Biến điệu hai thanh 3!", tip: "Đọc lǎobǎn biến điệu thành láobǎn khi gọi chủ quán.", isCore: false },
+      { word: "请问", py: "qǐngwèn", tone: "Âm Q bật hơi mạnh", tip: "Âm qǐng bật luồng hơi mạnh từ chân răng trên.", isCore: false },
+      { word: "买", py: "mǎi", tone: "Thanh 3 (Trầm sâu)", tip: "Tránh nhầm với 卖 (mài - Thanh 4: Bán).", isCore: true },
+      { word: "龙井茶", py: "Lóngjǐngchá", tone: "Thanh 2 + 3 + 2", tip: "Đặc sản trà nổi tiếng nhất vùng Tây Hồ.", isCore: false },
+      { word: "多少钱", py: "duōshao qián", tone: "shao thanh nhẹ", tip: "Hỏi giá kinh điển khi đi mua sắm.", isCore: false },
+      { word: "一斤", py: "yì jīn", tone: "500 gram", tip: "Chữ 一 đọc thành yì (thanh 4). 1 cân TQ = nửa ký VN.", isCore: false }
+    ]
+  },
+  4: {
+    hintTokens: [
+      { zh: "杭州天气", py: "Hángzhōu tiānqì" },
+      { zh: "很冷", py: "hěn lěng" },
+      { zh: "你想", py: "nǐ xiǎng" },
+      { zh: "喝杯", py: "hē bēi" },
+      { zh: "热奶茶", py: "rè nǎichá" },
+      { zh: "吗", py: "ma" }
+    ],
+    phonetics: [
+      { word: "杭州天气", py: "Hángzhōu tiānqì", tone: "Thanh 2 + 1 + 1 + 4", tip: "Hángzhōu đọc êm dịu, qì dứt khoát.", isCore: false },
+      { word: "很冷", py: "hén lěng", tone: "⚠️ Biến điệu hai thanh 3!", tip: "Đọc hěn thành hén (thanh 2).", isCore: false },
+      { word: "你想", py: "ní xiǎng", tone: "⚠️ Biến điệu hai thanh 3!", tip: "Đọc nǐ thành ní (thanh 2).", isCore: false },
+      { word: "喝", py: "hē", tone: "Thanh 1 (Cao phẳng)", tip: "Uống - giữ âm cao đều.", isCore: true },
+      { word: "热奶茶", py: "rè nǎichá", tone: "rè (thanh 4) + nǎichá (3+2)", tip: "Âm r rung nhẹ đầu lưỡi.", isCore: false }
+    ]
+  },
+  5: {
+    hintTokens: [
+      { zh: "师傅", py: "shīfu" },
+      { zh: "这里", py: "zhèli" },
+      { zh: "可以用", py: "kěyǐ yòng" },
+      { zh: "微信支付", py: "Wēixìn zhīfù" },
+      { zh: "吗", py: "ma" }
+    ],
+    phonetics: [
+      { word: "师傅", py: "shīfu", tone: "fu thanh nhẹ", tip: "Cách gọi tài xế taxi / nhân viên nam lịch sự.", isCore: false },
+      { word: "可以用", py: "kéyǐ yòng", tone: "⚠️ Biến điệu hai thanh 3!", tip: "kěyǐ đọc thành kéyǐ.", isCore: false },
+      { word: "扫", py: "sǎo", tone: "Thanh 3", tip: "Quét mã thanh toán.", isCore: true },
+      { word: "微信支付", py: "Wēixìn zhīfù", tone: "Thanh 1 + 4 + 1 + 4", tip: "Công cụ sinh tồn thanh toán số 1 Trung Quốc.", isCore: false },
+      { word: "吗", py: "ma", tone: "Thanh nhẹ", tip: "Hạt từ nghi vấn, buông hơi nhẹ ở cuối câu.", isCore: false }
+    ]
+  }
+};
+
 // 6. WORD PUZZLE WITH DISTRACTORS (UX 6 Fix)
 // ==========================================================
 function resetPuzzle() {
   const cur = lessons[currentDayIndex];
   userSelectedWords = [];
-  document.getElementById('puzzle-prompt').textContent = cur.puzzlePrompt;
-  const prPrompt = document.getElementById('practice-prompt'); if (prPrompt) prPrompt.textContent = cur.puzzlePrompt;
+  
+  // Safe element lookup to prevent null crashes
+  const pPrompt = document.getElementById('practice-prompt') || document.getElementById('puzzle-prompt');
+  if (pPrompt) pPrompt.textContent = cur.puzzlePrompt;
+
   if (currentPracticeTab === 'type') initTypeExercise();
   if (currentPracticeTab === 'speech') initSpeechExercise();
+  
   const pool = document.getElementById('word-pool');
-  pool.innerHTML = '';
+  if (pool) {
+    pool.innerHTML = '';
+    // Combine scrambled words + distractors
+    const fullList = [...cur.scrambled, ...(cur.distractors || [])].sort(() => Math.random() - 0.5);
 
-  // Combine scrambled words + distractors
-  const fullList = [...cur.scrambled, ...(cur.distractors || [])].sort(() => Math.random() - 0.5);
-
-  fullList.forEach(w => {
-    const chip = document.createElement('button');
-    chip.className = 'word-chip zh';
-    chip.textContent = w;
-    chip.onclick = () => selectWord(w, chip);
-    pool.appendChild(chip);
-  });
+    fullList.forEach(w => {
+      const chip = document.createElement('button');
+      chip.className = 'word-chip zh';
+      chip.textContent = w;
+      chip.onclick = () => selectWord(w, chip);
+      pool.appendChild(chip);
+    });
+  }
 
   updateDropzone();
-  document.getElementById('explanation-box').style.display = 'none';
+  const exp = document.getElementById('explanation-box');
+  if (exp) exp.style.display = 'none';
 }
 
 function selectWord(word, chip) {
@@ -1410,11 +1545,64 @@ function switchPracticeTab(tab) {
   lucide.createIcons();
 }
 
+let revealedHintIndex = 0;
+
 function initTypeExercise() {
   const cur = currentLesson;
-  document.getElementById('type-pinyin-hint').textContent = cur.pyramid[3].py;
-  document.getElementById('type-input').value = '';
-  document.getElementById('type-feedback').style.display = 'none';
+  revealedHintIndex = 0;
+  
+  // Set Vietnamese prompt (Target Meaning)
+  const promptVi = document.getElementById('type-prompt-vi');
+  if (promptVi) promptVi.textContent = cur.pyramid[3].vi;
+  
+  // Reset input & hints
+  const inputEl = document.getElementById('type-input');
+  if (inputEl) inputEl.value = '';
+  
+  const hintContainer = document.getElementById('type-pinyin-hint-container');
+  if (hintContainer) hintContainer.style.display = 'none';
+  
+  const hintsArea = document.getElementById('type-revealed-hints');
+  if (hintsArea) hintsArea.innerHTML = '';
+  
+  const feedback = document.getElementById('type-feedback');
+  if (feedback) feedback.style.display = 'none';
+}
+
+function giveNextPinyinHint() {
+  const cur = currentLesson;
+  const extra = (typeof lessonExtras !== 'undefined' && lessonExtras[cur.day]) || null;
+  const tokens = (extra && extra.hintTokens) || cur.scrambled.map(w => ({ zh: w, py: '' }));
+  
+  const hintContainer = document.getElementById('type-pinyin-hint-container');
+  const hintsArea = document.getElementById('type-revealed-hints');
+  if (!hintContainer || !hintsArea) return;
+  
+  hintContainer.style.display = 'block';
+  
+  if (revealedHintIndex < tokens.length) {
+    const t = tokens[revealedHintIndex];
+    const chip = document.createElement('div');
+    chip.style.cssText = `
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 8px; background: white;
+      border: 1px solid rgba(22,163,74,0.3); font-size: 13px;
+    `;
+    chip.innerHTML = `
+      <span style="font-size:11px;color:var(--text-caption);font-weight:600;">#${revealedHintIndex + 1}</span>
+      <span class="zh" style="font-weight:700;color:var(--text-primary);">${t.zh}</span>
+      <span style="color:var(--accent);font-weight:600;">(${t.py})</span>
+      <button onclick="playAudio('${t.zh.replace(/'/g, "\\'")}');" style="background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:center;color:var(--accent);" title="Nghe âm">
+        <i data-lucide="volume-2" style="width:14px;height:14px;"></i>
+      </button>
+    `;
+    hintsArea.appendChild(chip);
+    revealedHintIndex++;
+    lucide.createIcons();
+    playAudio(t.zh);
+  } else {
+    showToast('Đã hiển thị toàn bộ gợi ý Pinyin của câu!', 'warn');
+  }
 }
 
 function cleanZhText(str) {
@@ -1430,39 +1618,124 @@ function checkTypeAnswer() {
   box.style.display = 'block';
 
   if (cleanUser === cleanTarget) {
-    box.style.cssText = 'display:block;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
     box.innerHTML = `
-      <strong style="display:block;font-size:14px;margin-bottom:4px;">🎉 Chính xác 100%!</strong>
-      Bạn đã gõ chuẩn chữ Hán: <span class="zh" style="font-weight:700;color:#111315;">${cur.pyramid[3].zh}</span>
-      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Rất tốt! Phản xạ ngón tay gõ Pinyin ra chữ Hán này sẽ giúp bạn chat WeChat mượt mà.</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+        <strong style="font-size:15px;">🎉 Hoàn toàn chính xác 100%!</strong>
+      </div>
+      <div>Chữ Hán chuẩn: <strong class="zh" style="font-size:16px;color:#111315;">${cur.pyramid[3].zh}</strong></div>
+      <div style="color:var(--accent);font-weight:600;margin-top:2px;">${cur.pyramid[3].py}</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">
+        ✨ Phản xạ ngón tay gõ Pinyin ra chữ Hán của bạn rất tốt! Bạn đã sẵn sàng để nhắn WeChat thực tế.
+      </div>
     `;
     playAudio(cur.pyramid[3].zh);
     showToast('Gõ chữ Hán hoàn toàn chính xác! 🎯', 'success');
   } else {
-    // Show diff
-    box.style.cssText = 'display:block;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;';
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;';
     box.innerHTML = `
-      <strong style="display:block;font-size:14px;margin-bottom:4px;">Chưa khớp hoàn toàn!</strong>
-      <div>Bạn đã gõ: <span class="zh" style="font-weight:600;color:#111315;">${userVal || '(chưa nhập)'}</span></div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px;">Chưa khớp hoàn toàn!</div>
+      <div>Bạn đã gõ: <span class="zh" style="font-weight:600;color:#111315;">${userVal || '(chưa nhập chữ)'}</span></div>
       <div style="margin-top:4px;">Đáp án chuẩn: <span class="zh" style="font-weight:700;color:var(--accent);">${cur.pyramid[3].zh}</span></div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Hãy kiểm tra lại xem có chọn nhầm chữ Hán đồng âm khi gõ Pinyin không nhé.</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">
+        💡 <em>Mẹo:</em> Khi gõ Pinyin, hãy nhìn kỹ danh sách từ gợi ý trên bàn phím để chọn đúng chữ Hán mang nghĩa tương ứng nhé!
+      </div>
     `;
-    showToast('Chưa khớp — Hãy xem câu đáp án chuẩn', 'error');
+    showToast('Chưa khớp — Hãy kiểm tra lại chữ Hán', 'error');
+  }
+}
+
+// ==========================================================
+// 8. TAB 3: SPEECH RECOGNITION WITH TONE BREAKDOWN & CORE DRILL
+// ==========================================================
+let speechPracticeMode = 'sentence'; // 'sentence' or 'core'
+
+function setSpeechPracticeMode(mode) {
+  speechPracticeMode = mode;
+  const btnSent = document.getElementById('speech-mode-sentence');
+  const btnCore = document.getElementById('speech-mode-core');
+  
+  if (mode === 'sentence') {
+    if (btnSent) { btnSent.className = 'pill pill-green'; btnSent.style.border = 'none'; }
+    if (btnCore) { btnCore.className = 'pill pill-ghost'; btnCore.style.border = '1px solid var(--border)'; }
+  } else {
+    if (btnCore) { btnCore.className = 'pill pill-green'; btnCore.style.border = 'none'; }
+    if (btnSent) { btnSent.className = 'pill pill-ghost'; btnSent.style.border = '1px solid var(--border)'; }
+  }
+  
+  updateSpeechTargetDisplay();
+  const resBox = document.getElementById('speech-result-box');
+  if (resBox) resBox.style.display = 'none';
+}
+
+function updateSpeechTargetDisplay() {
+  const cur = currentLesson;
+  const targetTextEl = document.getElementById('speech-target-text');
+  const targetPyEl = document.getElementById('speech-target-py');
+  
+  if (speechPracticeMode === 'sentence') {
+    if (targetTextEl) targetTextEl.textContent = cur.pyramid[3].zh;
+    if (targetPyEl) targetPyEl.textContent = cur.pyramid[3].py;
+  } else {
+    if (targetTextEl) targetTextEl.textContent = cur.coreWord;
+    if (targetPyEl) targetPyEl.textContent = `${cur.corePinyin} (${cur.coreMeaning})`;
+  }
+}
+
+function playCurrentSpeechTarget() {
+  const cur = currentLesson;
+  if (speechPracticeMode === 'sentence') {
+    playAudio(cur.pyramid[3].zh);
+  } else {
+    playAudio(cur.coreWord);
   }
 }
 
 function initSpeechExercise() {
   const cur = currentLesson;
-  document.getElementById('speech-target-text').textContent = cur.pyramid[3].zh;
-  document.getElementById('speech-target-py').textContent = cur.pyramid[3].py;
-  document.getElementById('speech-result-box').style.display = 'none';
-  document.getElementById('speech-listening-indicator').style.display = 'none';
+  setSpeechPracticeMode('sentence');
+  
+  // Render Tone & Syllable Guide Breakdown
+  const breakdownList = document.getElementById('speech-breakdown-list');
+  if (breakdownList) {
+    breakdownList.innerHTML = '';
+    const extra = (typeof lessonExtras !== 'undefined' && lessonExtras[cur.day]) || null;
+    const phonetics = (extra && extra.phonetics) || [
+      { word: cur.coreWord, py: cur.corePinyin, tone: 'Thanh điệu trọng tâm', tip: cur.phoneticTip, isCore: true }
+    ];
+    
+    phonetics.forEach(p => {
+      const item = document.createElement('div');
+      item.style.cssText = `
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 12px; border-radius: 10px; background: ${p.isCore ? '#FEF3C7' : '#FFFFFF'};
+        border: 1px solid ${p.isCore ? '#FDE68A' : 'var(--border)'}; font-size: 13px;
+      `;
+      item.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button onclick="playAudio('${p.word.replace(/'/g, "\\'")}');" class="btn-ghost" style="width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);" title="Nghe phát âm chuẩn">
+            <i data-lucide="volume-2" style="width:15px;height:15px;"></i>
+          </button>
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="zh" style="font-weight:700;font-size:15px;color:#111315;">${p.word}</span>
+              <span style="color:var(--accent);font-weight:600;font-size:13px;">[${p.py}]</span>
+              <span class="pill ${p.isCore ? 'pill-warn' : 'pill-ghost'}" style="font-size:10px;padding:2px 8px;">${p.tone}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">${p.tip}</div>
+          </div>
+        </div>
+      `;
+      breakdownList.appendChild(item);
+    });
+    lucide.createIcons();
+  }
 }
 
 function toggleSpeechRecording() {
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRec) {
-    showToast('Trình duyệt chưa hỗ trợ Web Speech API. Hãy mở bằng Chrome hoặc Edge!', 'error');
+    showToast('Trình duyệt chưa hỗ trợ Web Speech API. Hãy mở bằng Chrome hoặc Edge trên máy tính/Android!', 'error');
     return;
   }
 
@@ -1482,13 +1755,15 @@ function toggleSpeechRecording() {
 
     speechRecognition.onstart = () => {
       isRecording = true;
-      document.getElementById('speech-btn-label').textContent = 'Đang ghi âm... (Bấm để dừng)';
+      document.getElementById('speech-btn-label').textContent = 'Đang nghe... Hãy nói to rõ!';
       document.getElementById('speech-listening-indicator').style.display = 'block';
     };
 
     speechRecognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      evaluateSpeech(transcript);
+      const resultObj = e.results[0][0];
+      const transcript = resultObj.transcript;
+      const confidence = resultObj.confidence || 0.9;
+      evaluateSpeech(transcript, confidence);
     };
 
     speechRecognition.onerror = (e) => {
@@ -1498,7 +1773,7 @@ function toggleSpeechRecording() {
       if (e.error === 'not-allowed') {
         showToast('Vui lòng cho phép quyền truy cập Micro trên trình duyệt!', 'error');
       } else {
-        showToast('Chưa nghe rõ giọng nói. Hãy thử lại!', 'warn');
+        showToast('Chưa nghe rõ giọng nói. Hãy phát âm dứt khoát hơn!', 'warn');
       }
     };
 
@@ -1515,44 +1790,47 @@ function toggleSpeechRecording() {
   }
 }
 
-function evaluateSpeech(transcript) {
+function evaluateSpeech(transcript, confidence) {
   const cur = currentLesson;
   const cleanSpoken = cleanZhText(transcript);
-  const cleanTarget = cleanZhText(cur.pyramid[3].zh);
+  const targetZh = speechPracticeMode === 'sentence' ? cur.pyramid[3].zh : cur.coreWord;
+  const cleanTarget = cleanZhText(targetZh);
   const box = document.getElementById('speech-result-box');
+  if (!box) return;
   box.style.display = 'block';
 
-  // Calculate matching character count
-  let matchCount = 0;
-  for (const ch of cleanSpoken) {
-    if (cleanTarget.includes(ch)) matchCount++;
-  }
-  const maxLen = Math.max(cleanTarget.length, cleanSpoken.length, 1);
-  const score = Math.min(100, Math.round((matchCount / cleanTarget.length) * 100));
+  const isExact = (cleanSpoken === cleanTarget);
 
-  if (score >= 80) {
+  if (isExact) {
+    const confScore = Math.round(confidence * 100);
     box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <strong style="font-size:15px;">🎉 Phát âm rất tốt!</strong>
-        <span class="pill pill-green" style="font-size:11px;">Độ chuẩn: ${score}%</span>
+        <strong style="font-size:15px;">🎉 Nhận diện chính xác!</strong>
+        <span class="pill pill-green" style="font-size:11px;">Độ tự tin âm học: ${confScore}%</span>
       </div>
-      <div>AI bản địa nhận diện: <strong class="zh" style="font-size:16px;color:#111315;">"${transcript}"</strong></div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Giọng phát âm tự nhiên, người Hàng Châu nghe chắc chắn sẽ hiểu ngay!</div>
+      <div>AI nhận diện được: <strong class="zh" style="font-size:17px;color:#111315;">"${transcript}"</strong></div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
+        ${speechPracticeMode === 'core' 
+          ? `Xuất sắc! Bạn đã phát âm chuẩn thanh điệu của từ trọng tâm <strong>${cur.coreWord} (${cur.corePinyin})</strong> mà không cần ngữ cảnh câu trợ giúp!` 
+          : `Người Hàng Châu nghe chắc chắn sẽ hiểu ngay!`}
+      </div>
     `;
-    showToast(`Xuất sắc! Điểm phát âm: ${score}% 🎙️`, 'success');
+    showToast(`Phát âm chuẩn xác! 🎉`, 'success');
   } else {
     box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;';
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <strong style="font-size:14px;">Cần luyện thêm phát âm</strong>
-        <span class="pill pill-warn" style="font-size:11px;">Độ chuẩn: ${score}%</span>
+        <strong style="font-size:14px;">⚠️ Cần chỉnh lại phát âm / thanh điệu</strong>
+        <span class="pill pill-warn" style="font-size:11px;">Chưa khớp chuẩn</span>
       </div>
-      <div>AI nghe thành: <strong class="zh" style="font-size:15px;color:#111315;">"${transcript || '(chưa rõ)'}"</strong></div>
-      <div style="margin-top:4px;">Câu chuẩn: <strong class="zh" style="color:var(--accent);">${cur.pyramid[3].zh}</strong></div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">💡 Hãy bấm nút 🔊 nghe lại mẫu, chú ý ngắt nghỉ đúng chỗ và đọc to hơn một chút nhé!</div>
+      <div>AI nghe thấy: <strong class="zh" style="font-size:16px;color:#111315;">"${transcript || '(chưa rõ âm)'}"</strong></div>
+      <div style="margin-top:4px;">Mục tiêu cần đọc: <strong class="zh" style="color:var(--accent);font-size:16px;">${targetZh}</strong></div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">
+        🔍 <strong>Nguyên nhân thường gặp:</strong> Thanh điệu bị lệch (ví dụ thanh 3 chưa hạ đủ sâu, hoặc thanh 4 chưa rơi dứt khoát). Hãy bấm 🔊 ở danh sách bên dưới để nghe mẫu và nhại theo nhé!
+      </div>
     `;
-    showToast(`Điểm phát âm: ${score}%. Hãy thử lại to hơn!`, 'warn');
+    showToast('Phát âm chưa khớp — Hãy nghe mẫu và thử lại', 'warn');
   }
 }
 
