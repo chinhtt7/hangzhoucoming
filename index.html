@@ -226,7 +226,6 @@
       <span style="font-weight:700;font-size:15px;color:var(--text-primary);">Hangzhou 90</span>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <span id="mob-cloud-badge" class="pill pill-ghost" style="font-size:9px;" onclick="syncFromSupabase()">☁️ Offline</span>
       <span class="pill pill-green" style="font-size:10px;" id="mob-streak-pill">🔥 1 ngày</span>
       <span class="pill pill-ghost" style="font-size:10px;" id="mob-countdown-pill">92 ngày ✈️</span>
     </div>
@@ -242,8 +241,8 @@
         </div>
         <div>
           <div style="font-weight:700;font-size:16px;color:var(--text-primary);">Hangzhou 90</div>
-          <div style="font-size:11px;color:var(--text-caption);">Học Tiếng Trung Tác Chiến</div>
-          <div style="margin-top:4px;"><span id="cloud-status-badge" class="pill pill-ghost" style="font-size:10px;cursor:pointer;" onclick="syncFromSupabase()">☁️ Supabase: Chờ kết nối</span></div>
+          
+          
         </div>
       </div>
     </div>
@@ -319,8 +318,11 @@
       <!-- Lesson Header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <div>
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">
-            CHẶNG 1 · NGÀY <span id="hdr-day">1</span> / 90
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);">
+              CHẶNG 1 · NGÀY <span id="hdr-day">1</span> / 90
+            </span>
+            <span class="pill pill-green" id="lesson-streak-pill" style="font-size:10px;padding:2px 8px;">🔥 Bắt đầu ngày 1</span>
           </div>
           <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;" id="hdr-title">Rủ người yêu đi ăn lẩu ở Hàng Châu</h1>
         </div>
@@ -330,14 +332,7 @@
         </div>
       </div>
 
-      <!-- Pronunciation & Tone Sandhi Pill (Lộ trình 1 Fix) -->
-      <div style="background:#F0FDF4; border:1px solid #86EFAC; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
-        <i data-lucide="sparkles" style="width:18px;height:18px;color:var(--accent);flex-shrink:0;"></i>
-        <div style="font-size:12px; color:#15803D; line-height:1.5;">
-          <strong id="phonetic-tip-title">Biến điệu:</strong> 
-          <span id="phonetic-tip-body">Hai thanh 3 đi liền nhau (想你) thì chữ đầu đổi thành thanh 2 (đọc: xiáng nǐ).</span>
-        </div>
-      </div>
+      
 
       <!-- 5-Day Batch Navigator with Lock States (Lộ trình 3 Fix) -->
       <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;" id="day-tabs"></div>
@@ -967,6 +962,7 @@ function evaluateStreak() {
   const text = streak > 0 ? `🔥 ${streak} ngày liên tiếp` : `🔥 Bắt đầu ngày 1`;
   document.getElementById('streak-display').textContent = text;
   document.getElementById('mob-streak-pill').textContent = streak > 0 ? `🔥 ${streak} ngày` : `🔥 Ngày 1`;
+  const lPill = document.getElementById('lesson-streak-pill'); if (lPill) lPill.textContent = text;
   return streak;
 }
 
@@ -1891,14 +1887,78 @@ function renderProgress() {
 }
 
 // ==========================================================
-// 12. AUDIO & TOAST UTILITIES
+// 12. STUDIO-GRADE NEURAL AUDIO SYSTEM (Xiaoxiao Studio MP3)
 // ==========================================================
+const studioAudioMap = {
+  // Day 1
+  "想": "audio/d1_core.mp3",
+  "想你": "audio/d1_p2.mp3",
+  "我想跟你一起": "audio/d1_p3.mp3",
+  "今天我想跟你一起去吃火锅。": "audio/d1_p4.mp3",
+  // Day 2
+  "去": "audio/d2_core.mp3",
+  "去西湖": "audio/d2_p2.mp3",
+  "明天下午去西湖": "audio/d2_p3.mp3",
+  "明天下午我和女朋友去西湖散步。": "audio/d2_p4.mp3",
+  // Day 3
+  "买": "audio/d3_core.mp3",
+  "想买": "audio/d3_p2.mp3",
+  "这个多少钱？": "audio/d3_p3.mp3",
+  "老板，请问这个龙井茶多少钱一斤？": "audio/d3_p4.mp3",
+  // Day 4
+  "喝": "audio/d4_core.mp3",
+  "喝奶茶": "audio/d4_p2.mp3",
+  "你想喝什么？": "audio/d4_p3.mp3",
+  "杭州天气很冷，你想喝杯热奶茶吗？": "audio/d4_p4.mp3",
+  // Day 5
+  "扫": "audio/d5_core.mp3",
+  "扫码": "audio/d5_p2.mp3",
+  "可以扫码吗？": "audio/d5_p3.mp3",
+  "师傅，这里可以用微信支付吗？": "audio/d5_p4.mp3"
+};
+
+let currentAudioPlayer = null;
+
 function playAudio(text) {
+  const cleanKey = (text || '').trim();
+  
+  // Layer 1: Check Studio MP3 (zh-CN-XiaoxiaoNeural Studio Quality)
+  if (studioAudioMap[cleanKey]) {
+    if (currentAudioPlayer) {
+      currentAudioPlayer.pause();
+      currentAudioPlayer.currentTime = 0;
+    }
+    currentAudioPlayer = new Audio(studioAudioMap[cleanKey]);
+    currentAudioPlayer.play().catch(err => {
+      console.warn('MP3 play fallback to WebSpeech:', err);
+      playWebSpeechAudio(cleanKey);
+    });
+    return;
+  }
+
+  // Layer 2: Intelligent Neural Voice Web Speech Fallback
+  playWebSpeechAudio(cleanKey);
+}
+
+function playWebSpeechAudio(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'zh-CN';
-  u.rate = 0.85;
+  
+  // Prioritize Microsoft Xiaoxiao / Apple Tingting / Online Natural voices
+  const voices = window.speechSynthesis.getVoices();
+  const zhVoices = voices.filter(v => v.lang.startsWith('zh') || v.lang.includes('CN'));
+  
+  const bestVoice = zhVoices.find(v => v.name.includes('Xiaoxiao') || v.name.includes('Xiaoyi'))
+                 || zhVoices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && !v.name.includes('Yun'))
+                 || zhVoices.find(v => v.name.includes('Ting-Ting') || v.name.includes('Siri'))
+                 || zhVoices.find(v => v.name.includes('Google') && v.name.includes('普通话'))
+                 || zhVoices[0];
+                 
+  if (bestVoice) u.voice = bestVoice;
+  u.rate = 0.88;
+  u.pitch = 1.05;
   window.speechSynthesis.speak(u);
 }
 
