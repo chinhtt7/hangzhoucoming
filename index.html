@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangzhou 90 — Tiếng Trung Tác Chiến (v3)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Pinned Lucide icons version to avoid breaking changes -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    * { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      box-sizing: border-box;
+    }
+    .zh { font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+    /* Design System Tokens (LOG-VR Tracker Specification) */
+    :root {
+      --bg-app: #F5F6F8;
+      --bg-card: #FFFFFF;
+      --bg-sidebar: #FFFFFF;
+      --border: #EAEBEE;
+      --text-primary: #111315;
+      --text-secondary: #8A8F98;
+      --text-caption: #9AA0A8;
+      --accent: #16A34A;
+      --accent-dark: #2B2E33;
+      --warning: #F5A623;
+      --alert: #E4572E;
+      --shadow-card: 0 4px 16px rgba(17, 19, 21, 0.06);
+      --shadow-modal: 0 12px 32px rgba(17, 19, 21, 0.12);
+    }
+
+    body { 
+      background: var(--bg-app); 
+      color: var(--text-primary); 
+      margin: 0;
+      padding: 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+      position: relative;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .pill-green { background: var(--accent); color: white; }
+    .pill-dark  { background: var(--accent-dark); color: white; }
+    .pill-warn  { background: var(--warning); color: white; }
+    .pill-ghost { background: #F5F6F8; color: var(--text-secondary); border: 1px solid var(--border); }
+
+    .btn-primary {
+      background: var(--accent); color: white;
+      font-weight: 600; font-size: 14px;
+      padding: 10px 20px; border-radius: 10px;
+      transition: all 120ms; cursor: pointer; border: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-primary:hover { filter: brightness(0.93); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-secondary {
+      background: white; color: var(--text-primary);
+      font-weight: 500; font-size: 13px;
+      padding: 8px 16px; border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: all 120ms; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-secondary:hover { background: #FAFAFB; }
+
+    .btn-ghost {
+      background: transparent; color: var(--text-secondary);
+      font-size: 13px; font-weight: 500;
+      padding: 8px 12px; border-radius: 8px;
+      border: none; cursor: pointer; transition: all 120ms;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-ghost:hover { background: #F5F6F8; color: var(--text-primary); }
+
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    /* Desktop Sidebar */
+    .sidebar {
+      width: 260px; min-width: 260px;
+      background: var(--bg-sidebar);
+      height: 100vh; position: sticky; top: 0;
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      height: 42px; padding: 0 12px; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer; transition: all 120ms;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: #FAFAFB; color: var(--text-primary); }
+    .nav-item.active { color: var(--text-primary); font-weight: 600; background: #F5F6F8; }
+
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-caption); margin-top: 24px; margin-bottom: 8px;
+      padding: 0 12px;
+    }
+
+    /* Word chips & Dropzone */
+    .word-chip {
+      display: inline-flex; align-items: center;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid var(--border); background: white;
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      transition: all 120ms; color: var(--text-primary);
+    }
+    .word-chip:hover { border-color: var(--accent); background: rgba(22,163,74,0.04); }
+    .word-chip.distractor { border-color: #EAEBEE; }
+    .word-chip:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .drop-zone {
+      min-height: 54px; padding: 10px 12px;
+      border: 1.5px dashed var(--border); border-radius: 12px;
+      background: #FAFAFA; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+
+    /* Pyramid steps */
+    .pyramid-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; border-radius: 10px;
+      transition: 150ms;
+    }
+    .pyramid-step:hover { background: #F5F6F8; }
+    .pyramid-step + .pyramid-step { border-top: 1px solid var(--border); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: white; border-radius: 12px;
+      box-shadow: var(--shadow-modal);
+      padding: 14px 18px; display: flex; align-items: center; gap: 10px;
+      font-size: 13px; z-index: 1000; max-width: 360px;
+      border-left: 3px solid var(--accent);
+      animation: fadeIn 200ms ease;
+    }
+    .toast.error { border-left-color: var(--alert); }
+    .toast.warn { border-left-color: var(--warning); }
+
+    /* Modal Backdrop */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(17, 19, 21, 0.45);
+      backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center;
+      z-index: 999; padding: 16px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn 200ms ease forwards; }
+
+    /* ==========================================================
+       RESPONSIVE MOBILE STYLES (UX 1 Fix)
+       ========================================================== */
+    .mobile-bottom-nav { display: none; }
+    .mobile-header { display: none; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .app-layout { flex-direction: column !important; }
+      .main-content { 
+        padding: 16px 14px 80px 14px !important; 
+        max-width: 100% !important;
+      }
+      .mobile-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 16px; background: white; border-bottom: 1px solid var(--border);
+        position: sticky; top: 0; z-index: 30;
+      }
+      .mobile-bottom-nav {
+        display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+        height: 60px; background: white; border-top: 1px solid var(--border);
+        z-index: 40; justify-content: space-around; align-items: center;
+        padding: 0 4px;
+      }
+      .mobile-nav-btn {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 3px; font-size: 10px; color: var(--text-secondary); text-decoration: none;
+        background: transparent; border: none; cursor: pointer; flex: 1; padding: 6px 0;
+      }
+      .mobile-nav-btn.active { color: var(--accent); font-weight: 600; }
+      .mobile-nav-btn svg { width: 18px; height: 18px; }
+      .card { border-radius: 16px; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout" style="display:flex; min-height:100vh;">
+
+  <!-- ===== MOBILE TOP BAR ===== -->
+  <div class="mobile-header">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;" class="zh">杭</div>
+      <span style="font-weight:700;font-size:15px;color:var(--text-primary);">Hangzhou 90</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span class="pill pill-green" style="font-size:10px;" id="mob-streak-pill">🔥 1 ngày</span>
+      <span class="pill pill-ghost" style="font-size:10px;" id="mob-countdown-pill">92 ngày ✈️</span>
+    </div>
+  </div>
+
+  <!-- ===== DESKTOP SIDEBAR ===== -->
+  <aside class="sidebar">
+    <!-- Brand -->
+    <div style="padding: 20px 20px 0;">
+      <div style="display:flex; align-items:center; gap:10px; height:60px;">
+        <div style="width:34px;height:34px; border-radius:10px; background:var(--accent); display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-weight:700;font-size:16px;" class="zh">杭</span>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:16px;color:var(--text-primary);">Hangzhou 90</div>
+          <div style="font-size:11px;color:var(--text-caption);">Học Tiếng Trung Tác Chiến</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown & Real Progress (UX 5 Fix) -->
+    <div style="margin:0 16px 14px; background:#F5F6F8; border-radius:14px; padding:14px 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);">HÀNG CHÂU 20/12</span>
+        <span id="countdown-days-badge" style="font-size:11px;font-weight:600;color:var(--accent);">92 ngày nữa</span>
+      </div>
+      <div style="font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:8px;" id="progress-card-title">
+        Chặng 1: 0/5 bài
+      </div>
+      <!-- Real Study Progress Bar (not time elapsed) -->
+      <div style="background:var(--border); border-radius:999px; height:5px; overflow:hidden;">
+        <div id="real-study-bar" style="height:100%; border-radius:999px; background:var(--accent); width:0%; transition:width 0.4s;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-top:6px;">
+        <span id="study-pct-text">0% hoàn thành</span>
+        <span id="due-vocab-text">0 từ cần ôn</span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav style="flex:1; padding:0 16px; overflow-y:auto;">
+      <div class="section-label" style="margin-top:6px;">HỌC TẬP</div>
+      <a class="nav-item active" id="nav-learn" onclick="navigateTo('learn')">
+        <i data-lucide="book-open" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Bài học hôm nay
+      </a>
+      <a class="nav-item" id="nav-recall" onclick="navigateTo('recall')">
+        <i data-lucide="refresh-cw" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Ôn nhanh 5 phút (SM-2)
+      </a>
+      <a class="nav-item" id="nav-gate" onclick="navigateTo('gate')">
+        <i data-lucide="shield-check" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Gate Test Chặng 1
+      </a>
+      <a class="nav-item" id="nav-roadmap" onclick="navigateTo('roadmap')">
+        <i data-lucide="map" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Lộ trình 90 ngày
+      </a>
+
+      <div class="section-label">DỮ LIỆU & TIẾN TRÌNH</div>
+      <a class="nav-item" id="nav-progress" onclick="navigateTo('progress')">
+        <i data-lucide="bar-chart-2" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Thống kê kỷ luật
+      </a>
+      <a class="nav-item" id="nav-vocab" onclick="navigateTo('vocab')">
+        <i data-lucide="layers" style="width:18px;height:18px;stroke-width:1.5;"></i>
+        Kho 30+ từ vựng
+      </a>
+    </nav>
+
+    <!-- Footer with REAL streak check -->
+    <div style="padding:16px; border-top:1px solid var(--border);">
+      <div style="background:#F5F6F8; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;"></div>
+        <div>
+          <div style="font-size:11px;color:var(--text-secondary);">Chuỗi ngày học thực tế</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);" id="streak-display">🔥 1 ngày liên tiếp</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT (Single page scroll preserved as requested) ===== -->
+  <main class="main-content" style="flex:1; padding:28px 32px; overflow-y:auto; max-width:920px;">
+
+    <!-- ==================== SCREEN: LEARN ==================== -->
+    <div id="screen-learn" class="fade-in">
+      
+      <!-- Lesson Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">
+            CHẶNG 1: HỆ ĐIỀU HÀNH NGÔN NGỮ · NGÀY <span id="hdr-day">1</span> / 90
+          </div>
+          <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;" id="hdr-title">Rủ người yêu đi ăn lẩu ở Hàng Châu</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="pill pill-ghost" id="hdr-topic">Hẹn hò & Ẩm thực</span>
+          <button class="btn-secondary" onclick="playAudio(currentLesson.coreWord)">
+            <i data-lucide="volume-2" style="width:15px;height:15px;stroke-width:1.5;"></i>
+            Nghe từ gốc
+          </button>
+        </div>
+      </div>
+
+      <!-- Pronunciation & Tone Sandhi Pill (Lộ trình 1 Fix) -->
+      <div style="background:#F0FDF4; border:1px solid #86EFAC; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+        <i data-lucide="sparkles" style="width:18px;height:18px;color:var(--accent);flex-shrink:0;"></i>
+        <div style="font-size:12px; color:#15803D; line-height:1.5;">
+          <strong id="phonetic-tip-title">Quy tắc biến điệu hôm nay:</strong> 
+          <span id="phonetic-tip-body">Hai thanh 3 đi liền nhau (想你) thì chữ đầu đổi thành thanh 2 (đọc: xiáng nǐ).</span>
+        </div>
+      </div>
+
+      <!-- 5-Day Batch Navigator with Lock States (Lộ trình 3 Fix) -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;" id="day-tabs"></div>
+
+      <!-- SECTION 1: Real SM-2 Warmup Flashcards (Bug 4 & Lộ trình 4 Fix) -->
+      <div class="card" style="margin-bottom:16px;" id="warmup-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="history" style="width:17px;height:17px;color:var(--accent);stroke-width:1.5;"></i>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Khởi động chống quên (Spaced Repetition SM-2)</span>
+          </div>
+          <span class="pill pill-ghost" id="warmup-count-pill">Tự động chọn</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+          Các từ cần ôn lại hôm nay theo chu kỳ quên của não bộ:
+        </div>
+        <div id="warmup-card-zone"></div>
+      </div>
+
+      <!-- SECTION 2: Target Sentence & Core Word (Top-down) -->
+      <div class="card" style="margin-bottom:16px;">
+        <!-- Target Sentence First -->
+        <div style="background:#F5F6F8;border-radius:14px;padding:16px;margin-bottom:16px;border-left:3.5px solid var(--accent);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);">🎯 Câu mục tiêu bạn sẽ dùng ở Hàng Châu</span>
+            <button onclick="playAudio(currentLesson.pyramid[3].zh)" class="btn-ghost" style="padding:2px 6px;font-size:11px;">
+              <i data-lucide="volume-2" style="width:14px;height:14px;"></i> Nghe câu đích
+            </button>
+          </div>
+          <div class="zh" id="target-zh" style="font-size:21px;font-weight:700;color:var(--text-primary);margin-bottom:4px;cursor:pointer;" onclick="playAudio(currentLesson.pyramid[3].zh)"></div>
+          <div id="target-py" style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:4px;"></div>
+          <div id="target-vi" style="font-size:13px;color:var(--text-secondary);"></div>
+        </div>
+
+        <!-- Core Word Breakdown -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+          <div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">Từ hạt nhân hôm nay</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="zh" id="core-hanzi" style="font-size:40px;font-weight:700;color:var(--text-primary);"></span>
+              <div>
+                <div id="core-pinyin" style="font-size:18px;color:var(--accent);font-weight:600;"></div>
+                <div id="core-meaning" style="font-size:14px;color:var(--text-secondary);margin-top:2px;"></div>
+              </div>
+            </div>
+          </div>
+          <button onclick="playAudio(currentLesson.coreWord)" class="btn-secondary" style="height:38px;padding:0 12px;">
+            <i data-lucide="volume-2" style="width:16px;height:16px;"></i> Nghe từ
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Mẹo nhớ chiết tự bộ thủ -->
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <i data-lucide="lightbulb" style="width:16px;height:16px;color:var(--warning);stroke-width:1.5;flex-shrink:0;margin-top:2px;"></i>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">Mẹo nhớ mặt chữ (Chiết tự hình ảnh)</div>
+            <div id="core-mnemonic" style="font-size:13px;color:var(--text-secondary);line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Companion Words Bank (Lộ trình 2 Fix) -->
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:8px;">
+            Từ vựng bổ trợ trong bài (Cùng nạp để nhớ câu)
+          </div>
+          <div id="companion-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Sentence Expansion Pyramid -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="layers" style="width:17px;height:17px;color:var(--text-secondary);stroke-width:1.5;"></i>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Tháp Mở Rộng Kim Tự Tháp (4 Tầng)</span>
+          </div>
+          <span style="font-size:11px;color:var(--text-caption);">Bấm 🔊 để nhại giọng (Shadowing)</span>
+        </div>
+        <div id="pyramid-container"></div>
+      </div>
+
+      <!-- SECTION 4: Word Puzzle Challenge with Distractors (UX 6 Fix) -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="puzzle" style="width:17px;height:17px;color:var(--text-secondary);stroke-width:1.5;"></i>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Ghép câu — Tự tay xếp từ</span>
+          </div>
+          <span class="pill pill-warn" style="font-size:10px;">Có từ gây nhiễu</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;" id="puzzle-prompt"></div>
+
+        <!-- Target drop zone -->
+        <div class="drop-zone" id="selected-zone">
+          <span id="drop-placeholder" style="font-size:13px;color:var(--text-caption);font-style:italic;">Bấm các từ bên dưới theo đúng trật tự tiếng Trung...</span>
+        </div>
+
+        <!-- Scrambled chips with distractors -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;" id="word-pool"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+          <button class="btn-ghost" onclick="resetPuzzle()">
+            <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Xếp lại
+          </button>
+          <button class="btn-primary" onclick="checkPuzzle()">Kiểm tra trật tự</button>
+        </div>
+
+        <div id="explanation-box" style="display:none;margin-top:14px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
+      </div>
+
+      <!-- SECTION 5: Forced Output Missions (UX 4 Fix) -->
+      <div class="card" style="margin-bottom:20px; border: 1.5px solid #EAEBEE;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <i data-lucide="send" style="width:18px;height:18px;color:var(--accent);stroke-width:1.5;"></i>
+          <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Nhiệm vụ Output thực tế</span>
+          <span class="pill pill-dark" style="font-size:10px;margin-left:auto;">BẮT BUỘC 1 TRONG 3</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+          Theo khoa học học tập, bạn <strong style="color:var(--text-primary);">phải chọn và thực hiện ít nhất 1 nhiệm vụ</strong> thì nút hoàn thành bài học mới mở:
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;" id="mission-list"></div>
+      </div>
+
+      <!-- Bottom Navigation Controls -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-bottom:16px;">
+        <button class="btn-secondary" onclick="changeDay(currentDayIndex - 1)" id="prev-btn">
+          <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Ngày trước
+        </button>
+        <button class="btn-primary" onclick="validateAndComplete()" id="complete-btn" style="padding:12px 24px;">
+          <i data-lucide="check-circle" style="width:17px;height:17px;"></i> Hoàn thành hôm nay
+        </button>
+        <button class="btn-secondary" onclick="changeDay(currentDayIndex + 1)" id="next-btn">
+          Ngày sau <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== SCREEN: RECALL (SM-2) ==================== -->
+    <div id="screen-recall" style="display:none;" class="fade-in">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">CHẾ ĐỘ TRANH THỦ</div>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;">5 Phút Chống Quên (SM-2 Flashcards) ⚡</h1>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">
+          Thuật toán Spaced Repetition tự động tính toán thời điểm từ vựng chuẩn bị rơi vào vùng quên để nhắc bạn ôn lại.
+        </p>
+      </div>
+
+      <div id="recall-card-container"></div>
+
+      <div style="display:flex;justify-content:center;margin-top:20px;gap:12px;">
+        <button class="btn-secondary" onclick="renderRecallCards()">
+          <i data-lucide="shuffle" style="width:14px;height:14px;"></i> Đổi nhóm từ khác
+        </button>
+        <button class="btn-primary" onclick="navigateTo('learn')">
+          Quay lại bài học chính
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN: GATE TEST (Lộ trình 5 Fix) ==================== -->
+    <div id="screen-gate" style="display:none;" class="fade-in">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">KHẢO THÍ CHẶN CỔNG</div>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;">Gate Test Chặng 1 (Ngày 1 – 5) 🛡️</h1>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">
+          Để mở khóa Chặng 2 (Ngày 6 – 10), bạn cần đạt ít nhất <strong>80% (4/5 câu)</strong> bài kiểm tra tổng hợp trật tự từ và biến điệu dưới đây.
+        </p>
+      </div>
+
+      <div class="card" id="gate-test-card">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN: ROADMAP ==================== -->
+    <div id="screen-roadmap" style="display:none;" class="fade-in">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">CHIẾN LƯỢC TOÀN DIỆN</div>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;">Lộ Trình 90 Ngày ✈️ Đến Hàng Châu 20/12</h1>
+      </div>
+      <div id="roadmap-content"></div>
+    </div>
+
+    <!-- ==================== SCREEN: PROGRESS ==================== -->
+    <div id="screen-progress" style="display:none;" class="fade-in">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">ĐO LƯỜNG SỰ KỶ LUẬT</div>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;">Bảng Thống Kê Học Tập</h1>
+      </div>
+      <div id="progress-content"></div>
+    </div>
+
+    <!-- ==================== SCREEN: VOCAB ==================== -->
+    <div id="screen-vocab" style="display:none;" class="fade-in">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">TỔNG KHO TỪ VỰNG</div>
+        <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;">Từ Vựng Đã Nạp (Gồm cả từ bổ trợ)</h1>
+      </div>
+      <div id="vocab-content"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== MOBILE BOTTOM NAV (UX 1 Fix) ===== -->
+<div class="mobile-bottom-nav">
+  <button class="mobile-nav-btn active" id="mob-nav-learn" onclick="navigateTo('learn')">
+    <i data-lucide="book-open"></i>
+    <span>Bài học</span>
+  </button>
+  <button class="mobile-nav-btn" id="mob-nav-recall" onclick="navigateTo('recall')">
+    <i data-lucide="refresh-cw"></i>
+    <span>Ôn tập</span>
+  </button>
+  <button class="mobile-nav-btn" id="mob-nav-gate" onclick="navigateTo('gate')">
+    <i data-lucide="shield-check"></i>
+    <span>Gate Test</span>
+  </button>
+  <button class="mobile-nav-btn" id="mob-nav-progress" onclick="navigateTo('progress')">
+    <i data-lucide="bar-chart-2"></i>
+    <span>Tiến độ</span>
+  </button>
+  <button class="mobile-nav-btn" id="mob-nav-vocab" onclick="navigateTo('vocab')">
+    <i data-lucide="layers"></i>
+    <span>Từ vựng</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETION SUMMARY MODAL (UX 3 Fix) ===== -->
+<div id="completion-modal" class="modal-overlay" style="display:none;">
+  <div class="card" style="max-width:440px; width:100%; border-radius:24px; padding:28px; box-shadow:var(--shadow-modal); text-align:center;">
+    <div style="width:56px;height:56px;border-radius:16px;background:#F0FDF4;color:#16A34A;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;">
+      🎉
+    </div>
+    <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin:0 0 6px 0;" id="modal-title">
+      Hoàn Thành Bài Học Ngày 1!
+    </h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin:0 0 20px 0;">
+      Bạn đã kích hoạt thành công câu phản xạ và hoàn thành nhiệm vụ Output thực tế.
+    </p>
+
+    <div style="background:#F5F6F8;border-radius:14px;padding:14px;text-align:left;margin-bottom:20px;font-size:12px;line-height:1.6;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="color:var(--text-secondary);">Chuỗi kỷ luật:</span>
+        <strong style="color:var(--accent);" id="modal-streak">🔥 1 ngày liên tiếp</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="color:var(--text-secondary);">Từ hạt nhân:</span>
+        <strong style="color:var(--text-primary);" id="modal-core-word">想 (xiǎng)</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="color:var(--text-secondary);">Từ bổ trợ đã học:</span>
+        <span style="color:var(--text-primary);font-weight:600;" id="modal-comp-count">6 từ</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--text-secondary);">Lịch ôn lại theo SM-2:</span>
+        <span style="color:var(--accent);font-weight:600;" id="modal-next-review">Ngày mai</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn-secondary" style="flex:1;" onclick="closeModal()">Xem lại bài</button>
+      <button class="btn-primary" style="flex:1;" onclick="modalGoNext()">Sang ngày tiếp →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ==========================================================
+// 1. DATA REPOSITORY WITH COMPANIONS & PHONETICS
+// ==========================================================
+const lessons = [
+  {
+    day: 1, topic: "Hẹn hò & Ẩm thực",
+    title: "Rủ người yêu đi ăn lẩu ở Hàng Châu",
+    phoneticTitle: "Biến điệu hai thanh 3 (想你):",
+    phoneticTip: "Khi hai thanh 3 đi liền nhau, chữ đầu tiên đọc thành thanh 2: 想 (xiǎng) + 你 (nǐ) → đọc là xiáng nǐ.",
+    coreWord: "想", corePinyin: "xiǎng", coreMeaning: "Muốn / Nhớ",
+    coreMnemonic: "Phía trên gồm bộ Mộc 木 + bộ Mục 目 = 相 (tương). Phía dưới là bộ Tâm 心 (trái tim). Người khắc sâu trong tim là người mình NHỚ và MUỐN gặp.",
+    companions: [
+      { zh: "今天", py: "jīntiān", vi: "hôm nay" },
+      { zh: "我", py: "wǒ", vi: "tôi / anh" },
+      { zh: "跟你", py: "gēn nǐ", vi: "cùng em" },
+      { zh: "一起", py: "yìqǐ", vi: "cùng nhau" },
+      { zh: "去", py: "qù", vi: "đi" },
+      { zh: "吃火锅", py: "chī huǒguō", vi: "ăn lẩu" }
+    ],
+    pyramid: [
+      { zh: "想", py: "xiǎng", vi: "Muốn / Nhớ" },
+      { zh: "想你", py: "xiǎng nǐ", vi: "Nhớ em (Đọc biến điệu: xiáng nǐ)" },
+      { zh: "我想跟你一起", py: "wǒ xiǎng gēn nǐ yìqǐ", vi: "Anh muốn cùng em" },
+      { zh: "今天我想跟你一起去吃火锅。", py: "Jīntiān wǒ xiǎng gēn nǐ yìqǐ qù chī huǒguō.", vi: "Hôm nay anh muốn cùng em đi ăn lẩu." }
+    ],
+    puzzlePrompt: "Dịch sang tiếng Trung: \"Hôm nay anh muốn cùng em đi ăn lẩu.\"",
+    scrambled: ["今天", "我", "想", "跟你", "一起", "去", "吃火锅"],
+    distractors: ["在", "看"], // UX 6 Fix: Distractor chips
+    correctOrder: ["今天", "我", "想", "跟你", "一起", "去", "吃火锅"],
+    alt: ["我", "今天", "想", "跟你", "一起", "去", "吃火锅"],
+    explanation: "<strong>🔑 Trật tự vàng:</strong> [Thời gian: 今天] + [Chủ ngữ: 我] + [Trợ động từ: 想] + [Cụm rủ rê: 跟你一起] + [Chuyển dịch: 去] + [Hành động: 吃火锅]. Cụm 'cùng ai' (跟你一起) bắt buộc phải đứng TRƯỚC động từ, không được để cuối câu như tiếng Việt.",
+    missions: [
+      { id: 0, level: "🟢 Dễ", text: "Đọc to câu 今天我想跟你一起去吃火锅 3 lần, ghi âm và nghe lại phát âm của mình." },
+      { id: 1, level: "🟡 Thực chiến", text: "Nhắn tin câu này cho người yêu trên WeChat ngay hôm nay." },
+      { id: 2, level: "🔴 Mở rộng", text: "Thay từ 'lẩu' (火锅) bằng món ăn khác bạn thích và gõ lại câu hoàn chỉnh." }
+    ]
+  },
+  {
+    day: 2, topic: "Sinh tồn & Đi lại",
+    title: "Cùng người yêu đi ngắm Tây Hồ (西湖)",
+    phoneticTitle: "Biến điệu của chữ 一 (yī):",
+    phoneticTip: "Khi chữ 一 đứng trước âm mang thanh 1, 2, 3 thì đọc thành thanh 4 (yì). Ví dụ: 一起 (yìqǐ), 一天 (yì tiān).",
+    coreWord: "去", corePinyin: "qù", coreMeaning: "Đi (đến)",
+    coreMnemonic: "Phía trên là bộ Thổ 土 (mặt đất), phía dưới là chữ Tư 厶. Bước chân rời khỏi mảnh đất để đi đến một chân trời mới.",
+    companions: [
+      { zh: "明天下午", py: "míngtiān xiàwǔ", vi: "chiều mai" },
+      { zh: "和女朋友", py: "hé nǚpéngyou", vi: "cùng bạn gái" },
+      { zh: "西湖", py: "Xīhú", vi: "Tây Hồ (Hàng Châu)" },
+      { zh: "散步", py: "sànbù", vi: "dạo phố / đi bộ" }
+    ],
+    pyramid: [
+      { zh: "去", py: "qù", vi: "Đi" },
+      { zh: "去西湖", py: "qù Xīhú", vi: "Đi Tây Hồ (biểu tượng Hàng Châu)" },
+      { zh: "明天下午去西湖", py: "míngtiān xiàwǔ qù Xīhú", vi: "Chiều mai đi Tây Hồ" },
+      { zh: "明天下午我和女朋友去西湖散步。", py: "Míngtiān xiàwǔ wǒ hé nǚpéngyou qù Xīhú sànbù.", vi: "Chiều mai tôi cùng bạn gái đi Tây Hồ dạo phố." }
+    ],
+    puzzlePrompt: "Dịch sang tiếng Trung: \"Chiều mai tôi cùng bạn gái đi Tây Hồ dạo phố.\"",
+    scrambled: ["明天下午", "我", "和女朋友", "去", "西湖", "散步"],
+    distractors: ["买", "吗"],
+    correctOrder: ["明天下午", "我", "和女朋友", "去", "西湖", "散步"],
+    alt: ["我", "明天下午", "和女朋友", "去", "西湖", "散步"],
+    explanation: "<strong>🔑 Trật tự vàng:</strong> [Thời gian: 明天下午] + [Chủ thể: 我和女朋友] + [Đến địa điểm: 去西湖] + [Hành động: 散步]. Logic tiếng Trung: Hành động nào xảy ra trước thì đứng trước (phải đến hồ rồi mới dạo bước).",
+    missions: [
+      { id: 0, level: "🟢 Dễ", text: "Đọc to câu 明天下午我和女朋友去西湖散步 3 lần, chú ý âm qù (thanh 4 dứt khoát)." },
+      { id: 1, level: "🟡 Thực chiến", text: "Hỏi người yêu: 20/12 sang Hàng Châu chúng mình đi Tây Hồ vào buổi nào?" },
+      { id: 2, level: "🔴 Mở rộng", text: "Thay Tây Hồ bằng địa điểm khác: Cổ trấn Ô Trấn (乌镇) hoặc Chùa Linh Ẩn (灵隐寺)." }
+    ]
+  },
+  {
+    day: 3, topic: "Mua sắm & Trả giá",
+    title: "Hỏi mua Trà Long Tỉnh Hàng Châu (龙井茶)",
+    phoneticTitle: "Phát âm âm bật hơi Q (请 qǐng):",
+    phoneticTip: "Âm 'q' trong 请问 (qǐngwèn) là âm bật hơi mạnh. Đặt đầu lưỡi sát chân răng trên, bật luồng hơi dứt khoát.",
+    coreWord: "买", corePinyin: "mǎi", coreMeaning: "Mua (sắm)",
+    coreMnemonic: "Chữ 买 có móc dưới như giỏ hàng. Chữ 卖 (mài - Bán) có thêm chữ thập (+) trên đầu biểu thị người bán bày hàng lên sạp.",
+    companions: [
+      { zh: "老板", py: "lǎobǎn", vi: "ông chủ / chủ tiệm" },
+      { zh: "请问", py: "qǐngwèn", vi: "cho tôi hỏi" },
+      { zh: "这个", py: "zhèige", vi: "cái này" },
+      { zh: "龙井茶", py: "Lóngjǐngchá", vi: "Trà Long Tỉnh" },
+      { zh: "多少钱", py: "duōshao qián", vi: "bao nhiêu tiền" },
+      { zh: "一斤", py: "yì jīn", vi: "1 cân (500g)" }
+    ],
+    pyramid: [
+      { zh: "买", py: "mǎi", vi: "Mua" },
+      { zh: "想买", py: "xiǎng mǎi", vi: "Muốn mua" },
+      { zh: "这个多少钱？", py: "zhèige duōshao qián?", vi: "Cái này bao nhiêu tiền?" },
+      { zh: "老板，请问这个龙井茶多少钱一斤？", py: "Lǎobǎn, qǐngwèn zhèige Lóngjǐngchá duōshao qián yì jīn?", vi: "Ông chủ ơi, cho hỏi trà Long Tỉnh này bao nhiêu tiền một cân?" }
+    ],
+    puzzlePrompt: "Dịch sang tiếng Trung: \"Ông chủ ơi, cho hỏi trà Long Tỉnh này bao nhiêu tiền một cân?\"",
+    scrambled: ["老板，", "请问", "这个龙井茶", "多少钱", "一斤？"],
+    distractors: ["去", "吃"],
+    correctOrder: ["老板，", "请问", "这个龙井茶", "多少钱", "一斤？"],
+    alt: ["请问", "老板，", "这个龙井茶", "多少钱", "一斤？"],
+    explanation: "<strong>🔑 Lưu ý du lịch TQ:</strong> '一斤' ở Trung Quốc bằng đúng 500g (nửa ký), KHÔNG PHẢI 1kg như Việt Nam. Luôn mở đầu bằng '请问' (qǐngwèn) để người bán niềm nở hơn.",
+    missions: [
+      { id: 0, level: "🟢 Dễ", text: "Đọc to câu hỏi mua trà 3 lần, luyện phản xạ hỏi giá 'duōshao qián yì jīn'." },
+      { id: 1, level: "🟡 Thực chiến", text: "Hỏi người yêu bằng tiếng Trung: Trà Long Tỉnh ở Hàng Châu mua tiệm nào uy tín?" },
+      { id: 2, level: "🔴 Mở rộng", text: "Tập đặt câu hỏi giá cho Tơ lụa Hàng Châu (丝绸 Sīchóu)." }
+    ]
+  },
+  {
+    day: 4, topic: "Quan tâm & Ẩm thực",
+    title: "Mua trà sữa nóng cho người yêu khi trời lạnh",
+    phoneticTitle: "Thanh nhẹ (轻声):",
+    phoneticTip: "Từ 吗 (ma) ở cuối câu hỏi đọc thật nhẹ và ngắn, không mang thanh điệu kéo dài.",
+    coreWord: "喝", corePinyin: "hē", coreMeaning: "Uống (đồ uống)",
+    coreMnemonic: "Bên trái là bộ Khẩu 口 (cái miệng liên quan ăn uống). Bên phải gợi hình ảnh làn khói ấm bốc lên từ ly trà nóng mùa đông.",
+    companions: [
+      { zh: "杭州天气", py: "Hángzhōu tiānqì", vi: "thời tiết Hàng Châu" },
+      { zh: "很冷", py: "hěn lěng", vi: "rất lạnh" },
+      { zh: "你想", py: "nǐ xiǎng", vi: "em muốn" },
+      { zh: "杯", py: "bēi", vi: "ly / cốc" },
+      { zh: "热奶茶", py: "rè nǎichá", vi: "trà sữa nóng" },
+      { zh: "吗？", py: "ma?", vi: "không?" }
+    ],
+    pyramid: [
+      { zh: "喝", py: "hē", vi: "Uống" },
+      { zh: "喝奶茶", py: "hē nǎichá", vi: "Uống trà sữa" },
+      { zh: "你想喝什么？", py: "nǐ xiǎng hē shénme?", vi: "Em muốn uống gì?" },
+      { zh: "杭州天气很冷，你想喝杯热奶茶吗？", py: "Hángzhōu tiānqì hěn lěng, nǐ xiǎng hē bēi rè nǎichá ma?", vi: "Hàng Châu trời rất lạnh, em muốn uống một ly trà sữa nóng không?" }
+    ],
+    puzzlePrompt: "Dịch sang tiếng Trung: \"Hàng Châu trời rất lạnh, em muốn uống trà sữa nóng không?\"",
+    scrambled: ["杭州天气很冷，", "你", "想", "喝", "杯热奶茶", "吗？"],
+    distractors: ["去", "多少钱"],
+    correctOrder: ["杭州天气很冷，", "你", "想", "喝", "杯热奶茶", "吗？"],
+    alt: [],
+    explanation: "<strong>🔑 Cấu trúc quan tâm:</strong> [Bối cảnh thời tiết] + [Lời rủ rê ngọt ngào: 你想喝...吗?]. Tháng 12 Hàng Châu rất lạnh (5-10°C), hỏi mua trà nóng (热 rè) là hành động ghi điểm tuyệt đối.",
+    missions: [
+      { id: 0, level: "🟢 Dễ", text: "Đọc to câu quan tâm thời tiết 3 lần. Chú ý thanh 3 của 'lěng' và thanh 4 của 'rè'." },
+      { id: 1, level: "🟡 Thực chiến", text: "Nhắn WeChat cho bạn gái: Hôm nay ở Hàng Châu trời có lạnh không? (杭州冷不冷?)" },
+      { id: 2, level: "🔴 Mở rộng", text: "Thay trà sữa bằng cà phê nóng (热咖啡 rè kāfēi)." }
+    ]
+  },
+  {
+    day: 5, topic: "Sinh tồn công nghệ",
+    title: "Quét mã WeChat Pay & Gọi xe Didi",
+    phoneticTitle: "Biến điệu chữ 不 (bù):",
+    phoneticTip: "Khi chữ 不 đứng trước thanh 4 thì đổi thành thanh 2 (bú). Ví dụ: 不是 (bú shì), 不要 (bú yào).",
+    coreWord: "扫", corePinyin: "sǎo", coreMeaning: "Quét (mã QR)",
+    coreMnemonic: "Bộ Thủ 扌 (bàn tay cầm điện thoại). Ở Trung Quốc không dùng tiền mặt, giơ tay quét mã gọi là 扫码 (sǎo mǎ).",
+    companions: [
+      { zh: "师傅", py: "shīfu", vi: "bác tài / tài xế" },
+      { zh: "这里", py: "zhèlǐ", vi: "ở đây" },
+      { zh: "可以", py: "kěyǐ", vi: "có thể" },
+      { zh: "用微信", py: "yòng Wēixìn", vi: "dùng WeChat" },
+      { zh: "支付", py: "zhīfù", vi: "thanh toán" }
+    ],
+    pyramid: [
+      { zh: "扫", py: "sǎo", vi: "Quét" },
+      { zh: "扫码", py: "sǎo mǎ", vi: "Quét mã QR" },
+      { zh: "可以扫码吗？", py: "kěyǐ sǎo mǎ ma?", vi: "Có thể quét mã không?" },
+      { zh: "师傅，这里可以用微信支付吗？", py: "Shīfu, zhèlǐ kěyǐ yòng Wēixìn zhīfù ma?", vi: "Bác tài xế ơi, ở đây có thể dùng WeChat Pay thanh toán không?" }
+    ],
+    puzzlePrompt: "Dịch sang tiếng Trung: \"Bác tài xế ơi, ở đây có thể dùng WeChat Pay không?\"",
+    scrambled: ["师傅，", "这里", "可以", "用微信", "支付", "吗？"],
+    distractors: ["吃", "想你"],
+    correctOrder: ["师傅，", "这里", "可以", "用微信", "支付", "吗？"],
+    alt: [],
+    explanation: "<strong>🔑 Giao tiếp sinh tồn:</strong> Luôn xưng hô tài xế là '师傅' (Shīfu). Cấu trúc: [Có thể làm gì không: 可以 + Hành động + 吗?]. Hành động ở đây là [dùng WeChat thanh toán: 用微信支付].",
+    missions: [
+      { id: 0, level: "🟢 Dễ", text: "Đọc to câu hỏi bác tài 3 lần với ngữ điệu tự nhiên, dứt khoát." },
+      { id: 1, level: "🟡 Thực chiến", text: "Hỏi người yêu xem app Didi của bạn đã liên kết thẻ thanh toán quốc tế được chưa." },
+      { id: 2, level: "🔴 Mở rộng", text: "Thay WeChat bằng Alipay (支付宝 Zhīfùbǎo) để đặt câu hỏi tương tự." }
+    ]
+  }
+];
+
+const roadmapPhases = [
+  { phase: 1, days: "1–15", emoji: "🔧", label: "Cài lại Hệ điều hành ngôn ngữ", desc: "Thuộc lòng 4 thanh điệu, trật tự từ vàng, 5 kỹ năng sinh tồn đầu tiên ở Hàng Châu.", color: "#16A34A" },
+  { phase: 2, days: "16–45", emoji: "🏗️", label: "Bứt phá HSK 2 & Sinh tồn độc lập", desc: "Ga tàu Hàng Châu Đông, mặc cả chợ đêm, xử lý lạc đường, chat WeChat mỗi ngày.", color: "#2B2E33" },
+  { phase: 3, days: "46–75", emoji: "🗣️", label: "Chạm ngõ HSK 3 & Giao tiếp tự nhiên", desc: "Gặp gỡ bạn bè người yêu, văn hóa bàn ăn Giang Nam, Shadowing tốc độ nói tự nhiên.", color: "#F5A623" },
+  { phase: 4, days: "76–90", emoji: "✈️", label: "Tổng diễn tập thực chiến", desc: "100% Roleplay mô phỏng hạ cánh sân bay Tiêu Sơn đến Tây Hồ. Không học từ mới.", color: "#E4572E" }
+];
+
+// Gate Test Questions (Lộ trình 5 Fix)
+const gateTestQuestions = [
+  {
+    q: "1. Hai thanh 3 đi liền nhau trong câu '我想你' (wǒ xiǎng nǐ) phát âm chuẩn thế nào?",
+    opts: ["wó xiáng nǐ", "wǒ xiáng nǐ", "wǒ xiǎng nǐ"],
+    ans: 1,
+    exp: "Khi hai thanh 3 đi cạnh nhau, chữ thứ nhất (想) biến thành thanh 2 (xiáng), chữ sau giữ nguyên (nǐ)."
+  },
+  {
+    q: "2. Câu nào sau đây đúng trật tự từ tiếng Trung cho: 'Hôm nay tôi cùng bạn gái đi ăn lẩu'?",
+    opts: [
+      "我去吃火锅今天和我女朋友",
+      "今天我和女朋友一起去吃火锅",
+      "我和女朋友一起今天去吃火锅"
+    ],
+    ans: 1,
+    exp: "Trật tự vàng: Thời gian (今天) + Chủ thể cùng ai (我和女朋友一起) + Chuyển dịch (去) + Ăn lẩu (吃火锅)."
+  },
+  {
+    q: "3. '一斤' (yì jīn) ở các khu chợ tại Hàng Châu, Trung Quốc tương đương bao nhiêu gram?",
+    opts: ["1000g (1 kg)", "500g (nửa kg)", "250g"],
+    ans: 1,
+    exp: "Tại Trung Quốc đại lục, 1 cân (斤) quy chuẩn bằng đúng 500g."
+  },
+  {
+    q: "4. Khi chữ 不 đứng trước một chữ mang thanh 4 (như 不是, 不要), 不 sẽ biến điệu thành thanh mấy?",
+    opts: ["Thanh 1 (bū)", "Thanh 2 (bú)", "Vẫn giữ thanh 4 (bù)"],
+    ans: 1,
+    exp: "Quy tắc: 4 + 4 biến thành 2 + 4. Đọc là bú shì, bú yào."
+  },
+  {
+    q: "5. Khi muốn gọi bác tài xế taxi hoặc xe Didi lịch sự ở Hàng Châu, bạn gọi là gì?",
+    opts: ["老板 (Lǎobǎn)", "师傅 (Shīfu)", "先生 (Xiānsheng)"],
+    ans: 1,
+    exp: "Ở Trung Quốc, danh xưng chuẩn mực và lịch thiệp nhất cho tài xế là 师傅 (Shīfu)."
+  }
+];
+
+// ==========================================================
+// 2. REAL DISCIPLINE & STREAK STATE (Bug 1 Fix)
+// ==========================================================
+let currentDayIndex = 0;
+let userSelectedWords = [];
+let completedDays = JSON.parse(localStorage.getItem('hz90_completed') || '[]');
+let missionsDone = JSON.parse(localStorage.getItem('hz90_missions') || '{}');
+let wordMemory = JSON.parse(localStorage.getItem('hz90_memory') || '{}'); // Real SM-2
+let gateTestPassed = localStorage.getItem('hz90_gate1_passed') === 'true';
+
+// Streak evaluation based on real calendar days
+function getTodayDateStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getYesterdayDateStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function evaluateStreak() {
+  let streak = parseInt(localStorage.getItem('hz90_streak') || '0');
+  const lastActiveDate = localStorage.getItem('hz90_last_date');
+  const todayStr = getTodayDateStr();
+  const yesterdayStr = getYesterdayDateStr();
+
+  if (!lastActiveDate) {
+    // First time
+    streak = completedDays.length > 0 ? 1 : 0;
+  } else if (lastActiveDate === todayStr) {
+    // Already active today, streak is valid
+  } else if (lastActiveDate === yesterdayStr) {
+    // Kept streak alive yesterday, ready for today
+  } else {
+    // Missed 1+ days -> reset streak to 0 or 1 upon action
+    streak = 0;
+    localStorage.setItem('hz90_streak', '0');
+  }
+
+  const text = streak > 0 ? `🔥 ${streak} ngày liên tiếp` : `🔥 Bắt đầu ngày 1`;
+  document.getElementById('streak-display').textContent = text;
+  document.getElementById('mob-streak-pill').textContent = streak > 0 ? `🔥 ${streak} ngày` : `🔥 Ngày 1`;
+  return streak;
+}
+
+function registerDayCompletedForStreak() {
+  const todayStr = getTodayDateStr();
+  const yesterdayStr = getYesterdayDateStr();
+  const lastActiveDate = localStorage.getItem('hz90_last_date');
+  let streak = parseInt(localStorage.getItem('hz90_streak') || '0');
+
+  if (lastActiveDate === todayStr) {
+    // Already counted today
+  } else if (lastActiveDate === yesterdayStr) {
+    streak++;
+  } else {
+    streak = 1;
+  }
+
+  localStorage.setItem('hz90_last_date', todayStr);
+  localStorage.setItem('hz90_streak', streak.toString());
+  evaluateStreak();
+  return streak;
+}
+
+// ==========================================================
+// 3. SM-2 SPACED REPETITION ENGINE (Bug 4 & Lộ trình 4 Fix)
+// ==========================================================
+function updateSM2(word, quality) {
+  // Quality: 5 = Remembered well, 3 = Vague, 1 = Forgot
+  const today = new Date();
+  let item = wordMemory[word] || { rep: 0, interval: 1, ef: 2.5, nextReview: getTodayDateStr() };
+
+  if (quality >= 3) {
+    if (item.rep === 0) item.interval = 1;
+    else if (item.rep === 1) item.interval = 3;
+    else item.interval = Math.round(item.interval * item.ef);
+
+    item.rep++;
+    item.ef = Math.max(1.3, item.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+  } else {
+    item.rep = 0;
+    item.interval = 1;
+  }
+
+  const nextDate = new Date(today);
+  nextDate.setDate(nextDate.getDate() + item.interval);
+  item.nextReview = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+  item.lastQuality = quality;
+
+  wordMemory[word] = item;
+  localStorage.setItem('hz90_memory', JSON.stringify(wordMemory));
+  updateRealProgress();
+}
+
+function getDueWords() {
+  const todayStr = getTodayDateStr();
+  const list = [];
+  lessons.forEach((l, idx) => {
+    if (idx < currentDayIndex) {
+      const data = wordMemory[l.coreWord];
+      if (!data || data.nextReview <= todayStr) {
+        list.push({ zh: l.coreWord, py: l.corePinyin, vi: l.coreMeaning, day: l.day });
+      }
+    }
+  });
+  return list;
+}
+
+// ==========================================================
+// 4. NAVIGATION & SCREEN CONTROLLER (Bug 2 & 3 Fix)
+// ==========================================================
+function navigateTo(screenName) {
+  const screens = ['learn', 'recall', 'gate', 'roadmap', 'progress', 'vocab'];
+  screens.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.style.display = (s === screenName) ? 'block' : 'none';
+  });
+
+  // Desktop sidebar active state
+  document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+  const activeNavItem = document.getElementById('nav-' + screenName);
+  if (activeNavItem) activeNavItem.classList.add('active');
+
+  // Mobile nav active state
+  document.querySelectorAll('.mobile-nav-btn').forEach(el => el.classList.remove('active'));
+  const mobActive = document.getElementById('mob-nav-' + screenName);
+  if (mobActive) mobActive.classList.add('active');
+
+  // Specific screen inits
+  if (screenName === 'recall') renderRecallCards();
+  if (screenName === 'gate') renderGateTest();
+  if (screenName === 'progress') renderProgress();
+  if (screenName === 'vocab') renderVocab();
+  if (screenName === 'roadmap') renderRoadmap();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  lucide.createIcons();
+}
+
+// ==========================================================
+// 5. LESSON RENDERER & PROGRESS
+// ==========================================================
+function renderLesson() {
+  const cur = lessons[currentDayIndex];
+  window.currentLesson = cur;
+
+  document.getElementById('hdr-day').textContent = cur.day;
+  document.getElementById('hdr-title').textContent = cur.title;
+  document.getElementById('hdr-topic').textContent = cur.topic;
+  document.getElementById('phonetic-tip-title').textContent = cur.phoneticTitle;
+  document.getElementById('phonetic-tip-body').textContent = cur.phoneticTip;
+
+  // Target sentence first (Top-down)
+  const targetP = cur.pyramid[3];
+  document.getElementById('target-zh').textContent = targetP.zh;
+  document.getElementById('target-py').textContent = targetP.py;
+  document.getElementById('target-vi').textContent = targetP.vi;
+
+  // Core word
+  document.getElementById('core-hanzi').textContent = cur.coreWord;
+  document.getElementById('core-pinyin').textContent = cur.corePinyin;
+  document.getElementById('core-meaning').textContent = cur.coreMeaning;
+  document.getElementById('core-mnemonic').textContent = cur.coreMnemonic;
+
+  // Companion chips (Lộ trình 2 Fix)
+  const compZone = document.getElementById('companion-chips');
+  compZone.innerHTML = '';
+  cur.companions.forEach(c => {
+    const chip = document.createElement('span');
+    chip.className = 'pill pill-ghost zh';
+    chip.style.cssText = 'font-size:12px;cursor:pointer;padding:4px 10px;text-transform:none;';
+    chip.innerHTML = `<span style="color:var(--text-primary);font-weight:600;">${c.zh}</span> <span style="color:var(--accent);font-size:11px;">(${c.py})</span>: ${c.vi}`;
+    chip.onclick = () => playAudio(c.zh);
+    compZone.appendChild(chip);
+  });
+
+  renderDayTabs();
+  renderPyramid(cur);
+  renderWarmup();
+  renderMissions(cur);
+  resetPuzzle();
+  updateRealProgress();
+  lucide.createIcons();
+
+  // Navigation button bounds
+  document.getElementById('prev-btn').disabled = currentDayIndex === 0;
+  document.getElementById('prev-btn').style.opacity = currentDayIndex === 0 ? '0.4' : '1';
+  document.getElementById('next-btn').disabled = currentDayIndex === lessons.length - 1;
+  document.getElementById('next-btn').style.opacity = currentDayIndex === lessons.length - 1 ? '0.4' : '1';
+}
+
+function renderDayTabs() {
+  const cont = document.getElementById('day-tabs');
+  cont.innerHTML = '';
+  lessons.forEach((l, idx) => {
+    const isDone = completedDays.includes(l.day);
+    const isActive = idx === currentDayIndex;
+
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      padding: 7px 14px; border-radius: 999px; border: 1px solid;
+      font-size: 12px; font-weight: ${isActive ? 600 : 500}; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      transition: all 120ms;
+      background: ${isActive ? '#16A34A' : isDone ? '#F0FDF4' : '#FFFFFF'};
+      border-color: ${isActive ? '#16A34A' : isDone ? '#86EFAC' : '#EAEBEE'};
+      color: ${isActive ? 'white' : isDone ? '#16A34A' : '#8A8F98'};
+    `;
+    btn.innerHTML = `<span class="zh" style="font-weight:700;">${l.coreWord}</span> <span>Ngày ${l.day}${isDone && !isActive ? ' ✓' : ''}</span>`;
+    btn.onclick = () => changeDay(idx);
+    cont.appendChild(btn);
+  });
+}
+
+function renderPyramid(cur) {
+  const cont = document.getElementById('pyramid-container');
+  cont.innerHTML = '';
+  cur.pyramid.forEach((step, idx) => {
+    const div = document.createElement('div');
+    div.className = 'pyramid-step';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#F5F6F8;flex-shrink:0;">
+        <span style="font-size:11px;font-weight:700;color:var(--text-caption);">T${idx+1}</span>
+      </div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+          <span class="zh" style="font-size:16px;font-weight:600;color:var(--text-primary);">${step.zh}</span>
+          <span style="font-size:12px;color:var(--accent);font-weight:500;">(${step.py})</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">→ ${step.vi}</div>
+      </div>
+      <button onclick="playAudio('${step.zh.replace(/'/g, "\\'")}');" class="btn-ghost" style="padding:4px 8px;">
+        <i data-lucide="volume-2" style="width:15px;height:15px;"></i>
+      </button>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+// Warmup with real SM-2 tracking
+function renderWarmup() {
+  const zone = document.getElementById('warmup-card-zone');
+  const due = getDueWords();
+
+  if (currentDayIndex === 0) {
+    zone.innerHTML = `
+      <div style="text-align:center;padding:14px;color:var(--text-caption);font-size:13px;background:#FAFAFA;border-radius:12px;">
+        Bài học khởi đầu — chưa có từ cũ cần ôn. Hoàn thành bài này để kích hoạt chu kỳ SM-2!
+      </div>`;
+    document.getElementById('warmup-count-pill').textContent = 'Chưa có từ cũ';
+    return;
+  }
+
+  if (due.length === 0) {
+    zone.innerHTML = `
+      <div style="text-align:center;padding:14px;color:#15803D;font-size:13px;background:#F0FDF4;border-radius:12px;border:1px solid #86EFAC;">
+        ✅ Tuyệt vời! Tất cả từ vựng trước đó đều đang trong vùng nhớ an toàn theo SM-2.
+      </div>`;
+    document.getElementById('warmup-count-pill').textContent = '0 từ cần ôn';
+    return;
+  }
+
+  document.getElementById('warmup-count-pill').textContent = `${due.length} từ đến hạn ôn`;
+  zone.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;">
+    ${due.slice(0, 3).map(w => `
+      <div id="wcard-${w.day}" style="flex:1;min-width:130px;background:#F5F6F8;border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border);cursor:pointer;" onclick="revealWarmup(${w.day}, '${w.zh}', '${w.py}', '${w.vi}')">
+        <div class="zh" style="font-size:28px;font-weight:700;color:var(--text-primary);">${w.zh}</div>
+        <div style="font-size:11px;color:var(--text-caption);margin-top:4px;">Chạm để lật nhớ</div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+function revealWarmup(day, zh, py, vi) {
+  const card = document.getElementById('wcard-' + day);
+  card.innerHTML = `
+    <div class="zh" style="font-size:24px;font-weight:700;color:var(--text-primary);">${zh}</div>
+    <div style="font-size:13px;color:var(--accent);font-weight:600;margin:3px 0;">${py}</div>
+    <div style="font-size:12px;color:var(--text-secondary);">${vi}</div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-top:10px;">
+      <button onclick="handleWarmupRate('${zh}', 5, this); event.stopPropagation();" style="padding:4px 8px;border-radius:6px;border:1px solid #86EFAC;background:#F0FDF4;color:#16A34A;font-size:11px;font-weight:600;cursor:pointer;">✓ Nhớ</button>
+      <button onclick="handleWarmupRate('${zh}', 3, this); event.stopPropagation();" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:white;color:var(--text-secondary);font-size:11px;font-weight:600;cursor:pointer;">⚠ Mờ</button>
+      <button onclick="handleWarmupRate('${zh}', 1, this); event.stopPropagation();" style="padding:4px 8px;border-radius:6px;border:1px solid #FECACA;background:#FEF2F2;color:var(--alert);font-size:11px;font-weight:600;cursor:pointer;">✗ Quên</button>
+    </div>
+  `;
+  playAudio(zh);
+}
+
+function handleWarmupRate(word, quality, btn) {
+  updateSM2(word, quality);
+  const card = btn.closest('div[id^="wcard-"]');
+  card.style.background = quality === 5 ? '#F0FDF4' : quality === 3 ? '#FFFBEB' : '#FEF2F2';
+  card.querySelectorAll('button').forEach(b => b.style.opacity = '0.35');
+  btn.style.opacity = '1';
+  showToast(quality === 5 ? 'Đã ghi nhận nhớ tốt (tăng khoảng cách ôn)' : 'Đã lên lịch ôn lại sớm hơn', 'success');
+}
+
+// ==========================================================
+// 6. WORD PUZZLE WITH DISTRACTORS (UX 6 Fix)
+// ==========================================================
+function resetPuzzle() {
+  const cur = lessons[currentDayIndex];
+  userSelectedWords = [];
+  document.getElementById('puzzle-prompt').textContent = cur.puzzlePrompt;
+  const pool = document.getElementById('word-pool');
+  pool.innerHTML = '';
+
+  // Combine scrambled words + distractors
+  const fullList = [...cur.scrambled, ...(cur.distractors || [])].sort(() => Math.random() - 0.5);
+
+  fullList.forEach(w => {
+    const chip = document.createElement('button');
+    chip.className = 'word-chip zh';
+    chip.textContent = w;
+    chip.onclick = () => selectWord(w, chip);
+    pool.appendChild(chip);
+  });
+
+  updateDropzone();
+  document.getElementById('explanation-box').style.display = 'none';
+}
+
+function selectWord(word, chip) {
+  userSelectedWords.push(word);
+  chip.disabled = true;
+  chip.style.opacity = '0.3';
+  updateDropzone();
+}
+
+function updateDropzone() {
+  const zone = document.getElementById('selected-zone');
+  zone.innerHTML = '';
+  if (userSelectedWords.length === 0) {
+    zone.innerHTML = `<span id="drop-placeholder" style="font-size:13px;color:var(--text-caption);font-style:italic;">Bấm các từ bên dưới theo đúng trật tự tiếng Trung...</span>`;
+    return;
+  }
+  userSelectedWords.forEach((w, i) => {
+    const chip = document.createElement('button');
+    chip.style.cssText = `
+      padding:6px 12px; border-radius:8px; border:1px solid var(--accent);
+      background:rgba(22,163,74,0.08); color:var(--accent); font-size:14px;
+      font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px;
+    `;
+    chip.innerHTML = `<span class="zh">${w}</span> <span style="font-size:10px;opacity:0.6;">✕</span>`;
+    chip.onclick = () => removeWord(i, w);
+    zone.appendChild(chip);
+  });
+}
+
+function removeWord(idx, word) {
+  userSelectedWords.splice(idx, 1);
+  const chips = document.querySelectorAll('#word-pool button');
+  for (const chip of chips) {
+    if (chip.textContent === word && chip.disabled) {
+      chip.disabled = false;
+      chip.style.opacity = '1';
+      break;
+    }
+  }
+  updateDropzone();
+}
+
+function checkPuzzle() {
+  const cur = lessons[currentDayIndex];
+  const isMatch = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+  const correct = isMatch(userSelectedWords, cur.correctOrder) || (cur.alt && cur.alt.length && isMatch(userSelectedWords, cur.alt));
+  const box = document.getElementById('explanation-box');
+  box.style.display = 'block';
+
+  if (correct) {
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
+    box.innerHTML = `<strong style="display:block;margin-bottom:6px;font-size:14px;">🎉 Chính xác 100%!</strong>${cur.explanation}`;
+    playAudio(userSelectedWords.join(''));
+    showToast('Xếp câu hoàn toàn chính xác! 🎯', 'success');
+  } else {
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;';
+    box.innerHTML = `
+      <strong style="display:block;margin-bottom:6px;font-size:14px;">Chưa đúng trật tự!</strong>
+      <div style="margin-bottom:8px;"><strong>Đáp án chuẩn:</strong> <span class="zh" style="font-weight:600;color:var(--text-primary);">${cur.correctOrder.join(' ')}</span></div>
+      ${cur.explanation}
+    `;
+    showToast('Chưa đúng trật tự — Hãy đọc giải thích bên dưới', 'error');
+  }
+}
+
+// ==========================================================
+// 7. MISSIONS & ENFORCED COMPLETION (UX 4 Fix)
+// ==========================================================
+function renderMissions(cur) {
+  const list = document.getElementById('mission-list');
+  list.innerHTML = '';
+  cur.missions.forEach(m => {
+    const key = `${cur.day}-${m.id}`;
+    const done = !!missionsDone[key];
+    const div = document.createElement('div');
+    div.style.cssText = `
+      display:flex; align-items:flex-start; gap:12px; padding:12px 14px;
+      border-radius:12px; border:1px solid ${done ? '#86EFAC' : 'var(--border)'};
+      background:${done ? '#F0FDF4' : '#FAFAFA'}; cursor:pointer; transition:150ms;
+    `;
+    div.innerHTML = `
+      <div style="width:24px;height:24px;border-radius:6px;background:${done ? '#16A34A' : '#EAEBEE'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:12px;font-weight:700;">
+        ${done ? '✓' : ''}
+      </div>
+      <div style="flex:1;">
+        <span style="font-size:11px;font-weight:600;color:${done ? '#16A34A' : 'var(--text-secondary)'};">${m.level}</span>
+        <div style="font-size:13px;color:var(--text-primary);line-height:1.5;margin-top:2px;">${m.text}</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:${done ? '#16A34A' : 'var(--text-caption)'};white-space:nowrap;margin-top:2px;">
+        ${done ? 'Đã hoàn thành' : 'Bấm để tick'}
+      </div>
+    `;
+    div.onclick = () => toggleMission(key);
+    list.appendChild(div);
+  });
+}
+
+function toggleMission(key) {
+  missionsDone[key] = !missionsDone[key];
+  localStorage.setItem('hz90_missions', JSON.stringify(missionsDone));
+  renderMissions(currentLesson);
+  if (missionsDone[key]) showToast('Đã xác nhận hoàn thành Output thực tế! 🎯', 'success');
+}
+
+// Validation with celebration summary modal (UX 3 Fix)
+function validateAndComplete() {
+  const cur = currentLesson;
+  const hasAtLeastOneMission = cur.missions.some(m => !!missionsDone[`${cur.day}-${m.id}`]);
+
+  if (!hasAtLeastOneMission) {
+    showToast('⚠️ Bạn bắt buộc phải chọn và thực hiện ít nhất 1 Nhiệm vụ Output trước!', 'warn');
+    const missionCard = document.getElementById('mission-list').parentElement;
+    missionCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    missionCard.style.borderColor = 'var(--warning)';
+    return;
+  }
+
+  // Record day completion
+  if (!completedDays.includes(cur.day)) {
+    completedDays.push(cur.day);
+    localStorage.setItem('hz90_completed', JSON.stringify(completedDays));
+  }
+
+  // Add core word to SM-2 memory with initial score
+  updateSM2(cur.coreWord, 5);
+
+  // Update streak
+  const streak = registerDayCompletedForStreak();
+
+  // Populate and show summary modal (UX 3 Fix)
+  document.getElementById('modal-title').textContent = `Hoàn Thành Bài Học Ngày ${cur.day}!`;
+  document.getElementById('modal-streak').textContent = `🔥 ${streak} ngày liên tiếp`;
+  document.getElementById('modal-core-word').textContent = `${cur.coreWord} (${cur.corePinyin})`;
+  document.getElementById('modal-comp-count').textContent = `${cur.companions.length} từ`;
+  document.getElementById('modal-next-review').textContent = "Sau 1 ngày (theo SM-2)";
+  document.getElementById('completion-modal').style.display = 'flex';
+
+  renderDayTabs();
+  updateRealProgress();
+}
+
+function closeModal() {
+  document.getElementById('completion-modal').style.display = 'none';
+}
+
+function modalGoNext() {
+  closeModal();
+  if (currentDayIndex < lessons.length - 1) {
+    changeDay(currentDayIndex + 1);
+  } else {
+    navigateTo('gate');
+  }
+}
+
+function changeDay(idx) {
+  if (idx >= 0 && idx < lessons.length) {
+    currentDayIndex = idx;
+    renderLesson();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ==========================================================
+// 8. REAL STUDY PROGRESS & COUNTDOWN (UX 5 Fix)
+// ==========================================================
+function updateRealProgress() {
+  const target = new Date("2026-12-20T00:00:00");
+  const now = new Date();
+  const diffDays = Math.max(0, Math.ceil((target - now) / 86400000));
+  document.getElementById('countdown-days-badge').textContent = `${diffDays} ngày nữa`;
+  document.getElementById('mob-countdown-pill').textContent = `${diffDays} ngày ✈️`;
+
+  // Real progress: based on lessons completed
+  const total = lessons.length;
+  const done = completedDays.length;
+  const pct = Math.round((done / total) * 100);
+
+  document.getElementById('progress-card-title').textContent = `Chặng 1: ${done}/${total} bài`;
+  document.getElementById('real-study-bar').style.width = pct + '%';
+  document.getElementById('study-pct-text').textContent = `${pct}% đã xong`;
+
+  const due = getDueWords();
+  document.getElementById('due-vocab-text').textContent = `${due.length} từ cần ôn`;
+}
+
+// ==========================================================
+// 9. RECALL SCREEN (SM-2 Flashcards)
+// ==========================================================
+function renderRecallCards() {
+  const cont = document.getElementById('recall-card-container');
+  cont.innerHTML = '';
+
+  const allWords = [];
+  lessons.forEach(l => {
+    allWords.push({ zh: l.coreWord, py: l.corePinyin, vi: l.coreMeaning, type: 'Từ hạt nhân' });
+    l.companions.forEach(c => allWords.push({ zh: c.zh, py: c.py, vi: c.vi, type: 'Từ bổ trợ' }));
+  });
+
+  const sample = [...allWords].sort(() => Math.random() - 0.5).slice(0, 5);
+
+  sample.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'card fade-in';
+    card.style.cssText = 'margin-bottom:14px;text-align:center;cursor:pointer;';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="pill pill-ghost" style="font-size:10px;">${w.type}</span>
+        <span style="font-size:11px;color:var(--text-caption);">Bấm để lật nghĩa</span>
+      </div>
+      <div class="zh" style="font-size:48px;font-weight:700;color:var(--text-primary);margin:10px 0;">${w.zh}</div>
+      <div class="reveal" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:18px;color:var(--accent);font-weight:600;">${w.py}</div>
+        <div style="font-size:14px;color:var(--text-secondary);margin-top:2px;">${w.vi}</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;">
+          <button onclick="updateSM2('${w.zh}', 5); showToast('Đã nhớ tốt!','success'); event.stopPropagation();" class="btn-secondary" style="padding:6px 14px;font-size:12px;color:#16A34A;">✓ Nhớ</button>
+          <button onclick="updateSM2('${w.zh}', 3); showToast('Sẽ ôn sớm','warn'); event.stopPropagation();" class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--warning);">⚠ Mờ</button>
+          <button onclick="updateSM2('${w.zh}', 1); showToast('Cần ôn kỹ lại','error'); event.stopPropagation();" class="btn-secondary" style="padding:6px 14px;font-size:12px;color:var(--alert);">✗ Quên</button>
+        </div>
+      </div>
+    `;
+    card.onclick = () => {
+      const r = card.querySelector('.reveal');
+      r.style.display = r.style.display === 'none' ? 'block' : 'none';
+      playAudio(w.zh);
+    };
+    cont.appendChild(card);
+  });
+}
+
+// ==========================================================
+// 10. GATE TEST ENGINE (Lộ trình 5 Fix)
+// ==========================================================
+let gateAnswers = {};
+
+function renderGateTest() {
+  const card = document.getElementById('gate-test-card');
+  const allLessonsDone = lessons.every(l => completedDays.includes(l.day));
+
+  if (!allLessonsDone && !gateTestPassed) {
+    card.innerHTML = `
+      <div style="text-align:center;padding:30px 16px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#F5F6F8;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;">🔒</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin:0 0 6px 0;">Cổng Đang Khóa</h3>
+        <p style="font-size:13px;color:var(--text-secondary);max-width:380px;margin:0 auto 16px;">
+          Bạn cần hoàn thành toàn bộ <strong>Ngày 1 đến Ngày 5</strong> của Chặng 1 trước khi được làm bài Gate Test để mở khóa Chặng 2.
+        </p>
+        <button class="btn-primary" onclick="navigateTo('learn')">Quay lại học tiếp</button>
+      </div>
+    `;
+    return;
+  }
+
+  if (gateTestPassed) {
+    card.innerHTML = `
+      <div style="text-align:center;padding:24px 16px;background:#F0FDF4;border-radius:16px;border:1px solid #86EFAC;">
+        <div style="font-size:32px;margin-bottom:8px;">🏆</div>
+        <h3 style="font-size:18px;font-weight:700;color:#15803D;margin:0 0 6px 0;">Đã Vượt Qua Gate Test Chặng 1!</h3>
+        <p style="font-size:13px;color:#166534;margin:0 0 16px 0;">
+          Hệ điều hành ngôn ngữ và trật tự từ của bạn đã đạt chuẩn. Sẵn sàng mở khóa Chặng 2 (Ngày 6 – 10: Ẩm thực & Sinh tồn Hàng Châu).
+        </p>
+        <button class="btn-secondary" onclick="retakeGateTest()">Làm lại bài kiểm tra</button>
+      </div>
+    `;
+    return;
+  }
+
+  // Render questions
+  let html = `<div style="margin-bottom:16px;font-size:13px;color:var(--text-secondary);">Chọn đáp án chính xác cho từng câu:</div>`;
+  gateTestQuestions.forEach((item, qIdx) => {
+    html += `
+      <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">${item.q}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${item.opts.map((opt, oIdx) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#FAFAFA;cursor:pointer;">
+              <input type="radio" name="gate_q_${qIdx}" value="${oIdx}" onchange="gateAnswers[${qIdx}]=${oIdx};" ${gateAnswers[qIdx]===oIdx?'checked':''}>
+              <span style="font-size:13px;color:var(--text-primary);">${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn-primary" onclick="submitGateTest()">Nộp bài khảo thí Chặng 1</button>
+    </div>
+  `;
+  card.innerHTML = html;
+}
+
+function submitGateTest() {
+  if (Object.keys(gateAnswers).length < gateTestQuestions.length) {
+    showToast('Vui lòng trả lời đủ cả 5 câu hỏi!', 'warn');
+    return;
+  }
+
+  let correctCount = 0;
+  gateTestQuestions.forEach((item, idx) => {
+    if (gateAnswers[idx] === item.ans) correctCount++;
+  });
+
+  if (correctCount >= 4) {
+    gateTestPassed = true;
+    localStorage.setItem('hz90_gate1_passed', 'true');
+    showToast(`Chúc mừng! Đạt ${correctCount}/5 câu (Qua cổng thành công 🎉)`, 'success');
+    renderGateTest();
+  } else {
+    showToast(`Chưa đạt: ${correctCount}/5 câu. Cần ít nhất 4/5 câu đúng. Hãy xem lại bài học!`, 'error');
+  }
+}
+
+function retakeGateTest() {
+  gateTestPassed = false;
+  localStorage.removeItem('hz90_gate1_passed');
+  gateAnswers = {};
+  renderGateTest();
+}
+
+// ==========================================================
+// 11. ROADMAP & VOCAB & PROGRESS
+// ==========================================================
+function renderRoadmap() {
+  const cont = document.getElementById('roadmap-content');
+  const phases = roadmapPhases.map(p => `
+    <div class="card" style="margin-bottom:14px;display:flex;gap:14px;align-items:flex-start;">
+      <div style="width:40px;height:40px;border-radius:10px;background:${p.color}15;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${p.emoji}</div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:11px;font-weight:700;color:${p.color};text-transform:uppercase;">GIAI ĐOẠN ${p.phase}</span>
+          <span class="pill pill-ghost" style="font-size:10px;">Ngày ${p.days}</span>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:3px;">${p.label}</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">${p.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  cont.innerHTML = phases;
+}
+
+function renderVocab() {
+  const cont = document.getElementById('vocab-content');
+  let rows = '';
+
+  lessons.forEach(l => {
+    rows += `
+      <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <span class="zh" style="font-size:24px;font-weight:700;width:40px;text-align:center;color:var(--text-primary);">${l.coreWord}</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--accent);">${l.corePinyin} <span style="color:var(--text-primary);font-weight:500;">— ${l.coreMeaning}</span></div>
+          <div style="font-size:11px;color:var(--text-caption);">Từ hạt nhân · Ngày ${l.day}</div>
+        </div>
+        <button onclick="playAudio('${l.coreWord}')" class="btn-ghost" style="padding:4px 8px;"><i data-lucide="volume-2" style="width:15px;height:15px;"></i></button>
+      </div>
+    `;
+    l.companions.forEach(c => {
+      rows += `
+        <div style="padding:8px 0 8px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+          <span class="zh" style="font-size:16px;font-weight:600;width:70px;color:var(--text-secondary);">${c.zh}</span>
+          <div style="flex:1;">
+            <span style="font-size:13px;color:var(--accent);">${c.py}</span>
+            <span style="font-size:13px;color:var(--text-primary);margin-left:6px;">— ${c.vi}</span>
+          </div>
+          <button onclick="playAudio('${c.zh}')" class="btn-ghost" style="padding:4px 8px;"><i data-lucide="volume-2" style="width:13px;height:13px;"></i></button>
+        </div>
+      `;
+    });
+  });
+
+  cont.innerHTML = `<div class="card">${rows}</div>`;
+  lucide.createIcons();
+}
+
+function renderProgress() {
+  const cont = document.getElementById('progress-content');
+  const streak = evaluateStreak();
+  const done = completedDays.length;
+  const mDone = Object.values(missionsDone).filter(Boolean).length;
+  const sm2Count = Object.keys(wordMemory).length;
+
+  cont.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--accent);">${done} / 5</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Bài Chặng 1 đã xong</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--text-primary);">${streak}</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">🔥 Ngày streak thật</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--warning);">${mDone}</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Nhiệm vụ Output xong</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:28px;font-weight:700;color:var(--text-primary);">${sm2Count}</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Từ lưu trong SM-2</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Tình trạng Gate Test Chặng 1</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+        ${gateTestPassed ? '✅ Bạn đã vượt qua bài kiểm tra chặn cổng Chặng 1.' : '⚠️ Cần hoàn thành đủ 5 ngày và đạt 4/5 câu bài Gate Test.'}
+      </div>
+      <button class="btn-secondary" onclick="navigateTo('gate')">Xem bài Gate Test</button>
+    </div>
+  `;
+}
+
+// ==========================================================
+// 12. AUDIO & TOAST UTILITIES
+// ==========================================================
+function playAudio(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `
+    <span style="font-size:15px;">${type === 'success' ? '✅' : type === 'warn' ? '⚠️' : '❌'}</span>
+    <span style="font-size:13px;color:var(--text-primary);">${msg}</span>
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ==========================================================
+// 13. APP BOOTSTRAP
+// ==========================================================
+window.addEventListener('DOMContentLoaded', () => {
+  evaluateStreak();
+  renderLesson();
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
