@@ -50,9 +50,9 @@ default_user = "chinhtt"
 
 try:
     if hasattr(st, "secrets"):
-        default_url = st.secrets.get("SUPABASE_URL", "")
-        default_key = st.secrets.get("SUPABASE_KEY", "")
-        default_user = st.secrets.get("USER_ID", "chinhtt")
+        default_url = st.secrets.get("SUPABASE_URL") or "https://wzuvtyjkrtrcygfouynu.supabase.co"
+        default_key = st.secrets.get("SUPABASE_KEY") or "sb_publishable_ZL7gyl-nH2mvRcXXXE5Iew_lUsqdqfz"
+        default_user = st.secrets.get("USER_ID") or "chinhtt"
 except Exception:
     pass
 

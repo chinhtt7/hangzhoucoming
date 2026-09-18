@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+
+  <script>
+    if (!window.SUPABASE_CONFIG) {
+      window.SUPABASE_CONFIG = {
+        url: "https://wzuvtyjkrtrcygfouynu.supabase.co",
+        key: "sb_publishable_ZL7gyl-nH2mvRcXXXE5Iew_lUsqdqfz",
+        userId: "chinhtt"
+      };
+    }
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hangzhou 90 — Tiếng Trung Tác Chiến (v3)</title>
@@ -309,16 +320,13 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <div>
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">
-            CHẶNG 1: HỆ ĐIỀU HÀNH NGÔN NGỮ · NGÀY <span id="hdr-day">1</span> / 90
+            CHẶNG 1 · NGÀY <span id="hdr-day">1</span> / 90
           </div>
           <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0;" id="hdr-title">Rủ người yêu đi ăn lẩu ở Hàng Châu</h1>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="pill pill-ghost" id="hdr-topic">Hẹn hò & Ẩm thực</span>
-          <button class="btn-secondary" onclick="playAudio(currentLesson.coreWord)">
-            <i data-lucide="volume-2" style="width:15px;height:15px;stroke-width:1.5;"></i>
-            Nghe từ gốc
-          </button>
+          <button class="btn-secondary" onclick="playAudio(currentLesson.coreWord)" style="width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;" title="Nghe phát âm"><i data-lucide="volume-2" style="width:18px;height:18px;stroke-width:1.5;"></i></button>
         </div>
       </div>
 
@@ -326,147 +334,213 @@
       <div style="background:#F0FDF4; border:1px solid #86EFAC; border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
         <i data-lucide="sparkles" style="width:18px;height:18px;color:var(--accent);flex-shrink:0;"></i>
         <div style="font-size:12px; color:#15803D; line-height:1.5;">
-          <strong id="phonetic-tip-title">Quy tắc biến điệu hôm nay:</strong> 
+          <strong id="phonetic-tip-title">Biến điệu:</strong> 
           <span id="phonetic-tip-body">Hai thanh 3 đi liền nhau (想你) thì chữ đầu đổi thành thanh 2 (đọc: xiáng nǐ).</span>
         </div>
       </div>
 
       <!-- 5-Day Batch Navigator with Lock States (Lộ trình 3 Fix) -->
-      <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;" id="day-tabs"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;" id="day-tabs"></div>
 
-      <!-- SECTION 1: Real SM-2 Warmup Flashcards (Bug 4 & Lộ trình 4 Fix) -->
-      <div class="card" style="margin-bottom:16px;" id="warmup-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <i data-lucide="history" style="width:17px;height:17px;color:var(--accent);stroke-width:1.5;"></i>
-            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Khởi động chống quên (Spaced Repetition SM-2)</span>
-          </div>
-          <span class="pill pill-ghost" id="warmup-count-pill">Tự động chọn</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
-          Các từ cần ôn lại hôm nay theo chu kỳ quên của não bộ:
-        </div>
-        <div id="warmup-card-zone"></div>
+      <!-- 3-STEP FOCUS STEPPER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;background:white;border-radius:14px;padding:5px;margin-bottom:18px;box-shadow:var(--shadow-card);border:1px solid var(--border);">
+        <button id="step-btn-1" class="btn-primary" onclick="goToStep(1)" style="flex:1;border-radius:10px;font-size:12px;padding:8px 4px;transition:120ms;border:none;">
+          <span>1. Nạp câu</span>
+        </button>
+        <div style="width:12px;height:1px;background:var(--border);flex-shrink:0;"></div>
+        <button id="step-btn-2" class="btn-ghost" onclick="goToStep(2)" style="flex:1;border-radius:10px;font-size:12px;padding:8px 4px;color:var(--text-secondary);transition:120ms;">
+          <span>2. Luyện tập</span>
+        </button>
+        <div style="width:12px;height:1px;background:var(--border);flex-shrink:0;"></div>
+        <button id="step-btn-3" class="btn-ghost" onclick="goToStep(3)" style="flex:1;border-radius:10px;font-size:12px;padding:8px 4px;color:var(--text-secondary);transition:120ms;">
+          <span>3. Đích đến</span>
+        </button>
       </div>
 
-      <!-- SECTION 2: Target Sentence & Core Word (Top-down) -->
-      <div class="card" style="margin-bottom:16px;">
-        <!-- Target Sentence First -->
-        <div style="background:#F5F6F8;border-radius:14px;padding:16px;margin-bottom:16px;border-left:3.5px solid var(--accent);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);">🎯 Câu mục tiêu bạn sẽ dùng ở Hàng Châu</span>
-            <button onclick="playAudio(currentLesson.pyramid[3].zh)" class="btn-ghost" style="padding:2px 6px;font-size:11px;">
-              <i data-lucide="volume-2" style="width:14px;height:14px;"></i> Nghe câu đích
+      <!-- ==================== STEP 1: NẠP CÂU (INPUT) ==================== -->
+      <div id="focus-step-1" class="fade-in">
+        
+        <!-- Target Sentence First (Top-down) -->
+        <div class="card" style="margin-bottom:14px;">
+          <div style="background:#F5F6F8;border-radius:14px;padding:16px;margin-bottom:14px;border-left:3.5px solid var(--accent);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);">🎯 Câu mục tiêu</span>
+                <span class="pill pill-green" id="phonetic-mini-badge" style="font-size:9px;padding:2px 8px;">Biến điệu</span>
+              </div>
+              <button onclick="playAudio(currentLesson.pyramid[3].zh)" class="btn-ghost" style="width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;" title="Nghe câu đích">
+                <i data-lucide="volume-2" style="width:16px;height:16px;"></i>
+              </button>
+            </div>
+            <div class="zh" id="target-zh" style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:4px;cursor:pointer;" onclick="playAudio(currentLesson.pyramid[3].zh)"></div>
+            <div id="target-py" style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:4px;"></div>
+            <div id="target-vi" style="font-size:13px;color:var(--text-secondary);"></div>
+          </div>
+
+          <!-- Core Word & Meaning -->
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:2px;">Từ hạt nhân</div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span class="zh" id="core-hanzi" style="font-size:38px;font-weight:700;color:var(--text-primary);"></span>
+                <div>
+                  <div id="core-pinyin" style="font-size:17px;color:var(--accent);font-weight:600;"></div>
+                  <div id="core-meaning" style="font-size:13px;color:var(--text-secondary);margin-top:1px;"></div>
+                </div>
+              </div>
+            </div>
+            <button onclick="playAudio(currentLesson.coreWord)" class="btn-secondary" style="width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;" title="Nghe phát âm">
+              <i data-lucide="volume-2" style="width:18px;height:18px;"></i>
             </button>
           </div>
-          <div class="zh" id="target-zh" style="font-size:21px;font-weight:700;color:var(--text-primary);margin-bottom:4px;cursor:pointer;" onclick="playAudio(currentLesson.pyramid[3].zh)"></div>
-          <div id="target-py" style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:4px;"></div>
-          <div id="target-vi" style="font-size:13px;color:var(--text-secondary);"></div>
-        </div>
 
-        <!-- Core Word Breakdown -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-          <div>
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:4px;">Từ hạt nhân hôm nay</div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span class="zh" id="core-hanzi" style="font-size:40px;font-weight:700;color:var(--text-primary);"></span>
-              <div>
-                <div id="core-pinyin" style="font-size:18px;color:var(--accent);font-weight:600;"></div>
-                <div id="core-meaning" style="font-size:14px;color:var(--text-secondary);margin-top:2px;"></div>
+          <!-- Clean Chiết tự dropdown / toggle -->
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+              <i data-lucide="lightbulb" style="width:15px;height:15px;color:var(--warning);flex-shrink:0;margin-top:2px;"></i>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">
+                <strong style="color:var(--text-primary);">Chiết tự:</strong> <span id="core-mnemonic"></span>
               </div>
             </div>
           </div>
-          <button onclick="playAudio(currentLesson.coreWord)" class="btn-secondary" style="height:38px;padding:0 12px;">
-            <i data-lucide="volume-2" style="width:16px;height:16px;"></i> Nghe từ
+
+          <!-- Companion Words Chips -->
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:6px;">Từ vựng bổ trợ:</div>
+            <div id="companion-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+        </div>
+
+        <!-- Tháp mở rộng từng tầng -->
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <i data-lucide="layers" style="width:16px;height:16px;color:var(--text-secondary);stroke-width:1.5;"></i>
+              <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Tháp mở rộng</span>
+            </div>
+            <span style="font-size:11px;color:var(--text-caption);">Mở từng tầng để nhớ sâu</span>
+          </div>
+          <div id="pyramid-container"></div>
+        </div>
+
+        <!-- Step 1 Actions -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-primary" onclick="goToStep(2)" style="width:100%;height:46px;font-size:14px;border-radius:12px;gap:8px;">
+            <span>Sang phần Luyện tập</span>
+            <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+          </button>
+          <div style="display:flex;justify-content:space-between;">
+            <button class="btn-ghost" onclick="changeDay(currentDayIndex - 1)" id="prev-btn" style="font-size:12px;">
+              <i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Ngày trước
+            </button>
+            <button class="btn-ghost" onclick="changeDay(currentDayIndex + 1)" id="next-btn" style="font-size:12px;">
+              Ngày sau <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== STEP 2: LUYỆN TẬP (PRACTICE) ==================== -->
+      <div id="focus-step-2" class="fade-in" style="display:none;">
+        
+        <div class="card" style="margin-bottom:16px;">
+          <!-- 3 Practice Tabs -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;" id="practice-tabs">
+              <button class="pill pill-green" id="ptab-order" onclick="switchPracticeTab('order')" style="cursor:pointer;border:none;">1. Ghép câu</button>
+              <button class="pill pill-ghost" id="ptab-type" onclick="switchPracticeTab('type')" style="cursor:pointer;border:1px solid var(--border);">2. Gõ Pinyin ⌨️</button>
+              <button class="pill pill-ghost" id="ptab-speech" onclick="switchPracticeTab('speech')" style="cursor:pointer;border:1px solid var(--border);">3. Phát âm 🎙️</button>
+            </div>
+            <span class="pill pill-warn" id="practice-badge" style="font-size:10px;">Có từ gây nhiễu</span>
+          </div>
+
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;" id="practice-prompt"></div>
+
+          <!-- TAB 1: GHÉP CÂU -->
+          <div id="pzone-order">
+            <div class="drop-zone" id="selected-zone">
+              <span id="drop-placeholder" style="font-size:13px;color:var(--text-caption);font-style:italic;">Chạm các từ bên dưới theo trật tự câu...</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;" id="word-pool"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+              <button class="btn-ghost" onclick="resetPuzzle()">
+                <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Xếp lại
+              </button>
+              <button class="btn-primary" onclick="checkPuzzle()">Kiểm tra trật tự</button>
+            </div>
+            <div id="explanation-box" style="display:none;margin-top:14px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
+          </div>
+
+          <!-- TAB 2: GÕ PINYIN -->
+          <div id="pzone-type" style="display:none;">
+            <div style="margin-bottom:10px;">
+              <div style="font-size:11px;color:var(--text-caption);margin-bottom:4px;font-weight:600;text-transform:uppercase;">Gợi ý phát âm Pinyin:</div>
+              <div id="type-pinyin-hint" style="font-size:13px;color:var(--accent);font-weight:600;"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="type-input" class="input-field zh" placeholder="Gõ chữ Hán vào đây..." style="font-size:15px;" onkeydown="if(event.key==='Enter') checkTypeAnswer()">
+              <button class="btn-primary" onclick="checkTypeAnswer()" style="white-space:nowrap;padding:10px 18px;">Kiểm tra</button>
+            </div>
+            <div id="type-feedback" style="display:none;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
+          </div>
+
+          <!-- TAB 3: PHÁT ÂM MIC -->
+          <div id="pzone-speech" style="display:none;">
+            <div style="text-align:center;padding:14px 0 10px;">
+              <div class="zh" id="speech-target-text" style="font-size:19px;font-weight:700;color:var(--text-primary);margin-bottom:4px;"></div>
+              <div id="speech-target-py" style="font-size:13px;color:var(--accent);margin-bottom:16px;"></div>
+              
+              <button id="speech-mic-btn" class="btn-primary" onclick="toggleSpeechRecording()" style="padding:12px 26px;border-radius:999px;font-size:14px;box-shadow:0 4px 14px rgba(22,163,74,0.22);gap:8px;">
+                <i data-lucide="mic" style="width:18px;height:18px;"></i>
+                <span id="speech-btn-label">Bấm để nói (zh-CN)</span>
+              </button>
+              <div id="speech-listening-indicator" style="display:none;font-size:12px;color:var(--accent);font-weight:600;margin-top:10px;">
+                🎙️ Đang lắng nghe giọng của bạn...
+              </div>
+            </div>
+            <div id="speech-result-box" style="display:none;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Step 2 Actions -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <button class="btn-secondary" onclick="goToStep(1)" style="border-radius:10px;padding:10px 16px;">
+            <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Xem lại câu
+          </button>
+          <button class="btn-primary" onclick="goToStep(3)" style="border-radius:10px;padding:10px 20px;gap:6px;">
+            <span>Sang Nhiệm vụ</span>
+            <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
           </button>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Mẹo nhớ chiết tự bộ thủ -->
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <i data-lucide="lightbulb" style="width:16px;height:16px;color:var(--warning);stroke-width:1.5;flex-shrink:0;margin-top:2px;"></i>
-          <div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">Mẹo nhớ mặt chữ (Chiết tự hình ảnh)</div>
-            <div id="core-mnemonic" style="font-size:13px;color:var(--text-secondary);line-height:1.6;"></div>
-          </div>
-        </div>
-
-        <!-- Companion Words Bank (Lộ trình 2 Fix) -->
-        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-caption);margin-bottom:8px;">
-            Từ vựng bổ trợ trong bài (Cùng nạp để nhớ câu)
-          </div>
-          <div id="companion-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-        </div>
       </div>
 
-      <!-- SECTION 3: Sentence Expansion Pyramid -->
-      <div class="card" style="margin-bottom:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <i data-lucide="layers" style="width:17px;height:17px;color:var(--text-secondary);stroke-width:1.5;"></i>
-            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Tháp Mở Rộng Kim Tự Tháp (4 Tầng)</span>
+      <!-- ==================== STEP 3: ĐÍCH ĐẾN (OUTPUT) ==================== -->
+      <div id="focus-step-3" class="fade-in" style="display:none;">
+        
+        <div class="card" style="margin-bottom:16px;border:1.5px solid #EAEBEE;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <i data-lucide="send" style="width:17px;height:17px;color:var(--accent);stroke-width:1.5;"></i>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Nhiệm vụ thực tế</span>
+            <span class="pill pill-dark" style="font-size:10px;margin-left:auto;">CHỌN ÍT NHẤT 1</span>
           </div>
-          <span style="font-size:11px;color:var(--text-caption);">Bấm 🔊 để nhại giọng (Shadowing)</span>
-        </div>
-        <div id="pyramid-container"></div>
-      </div>
 
-      <!-- SECTION 4: Word Puzzle Challenge with Distractors (UX 6 Fix) -->
-      <div class="card" style="margin-bottom:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <i data-lucide="puzzle" style="width:17px;height:17px;color:var(--text-secondary);stroke-width:1.5;"></i>
-            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Ghép câu — Tự tay xếp từ</span>
-          </div>
-          <span class="pill pill-warn" style="font-size:10px;">Có từ gây nhiễu</span>
-        </div>
-        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;" id="puzzle-prompt"></div>
-
-        <!-- Target drop zone -->
-        <div class="drop-zone" id="selected-zone">
-          <span id="drop-placeholder" style="font-size:13px;color:var(--text-caption);font-style:italic;">Bấm các từ bên dưới theo đúng trật tự tiếng Trung...</span>
+          <div style="display:flex;flex-direction:column;gap:8px;" id="mission-list"></div>
         </div>
 
-        <!-- Scrambled chips with distractors -->
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;" id="word-pool"></div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
-          <button class="btn-ghost" onclick="resetPuzzle()">
-            <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Xếp lại
+        <!-- Big Celebratory Complete Action -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-primary" onclick="validateAndComplete()" id="complete-btn" style="width:100%;height:48px;font-size:15px;border-radius:12px;box-shadow:0 4px 16px rgba(22,163,74,0.3);gap:8px;">
+            <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
+            <span>Hoàn thành bài học hôm nay</span>
           </button>
-          <button class="btn-primary" onclick="checkPuzzle()">Kiểm tra trật tự</button>
+          
+          <button class="btn-secondary" onclick="goToStep(2)" style="width:100%;height:38px;font-size:13px;border-radius:10px;">
+            ← Quay lại phần Luyện tập
+          </button>
         </div>
 
-        <div id="explanation-box" style="display:none;margin-top:14px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;"></div>
-      </div>
-
-      <!-- SECTION 5: Forced Output Missions (UX 4 Fix) -->
-      <div class="card" style="margin-bottom:20px; border: 1.5px solid #EAEBEE;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <i data-lucide="send" style="width:18px;height:18px;color:var(--accent);stroke-width:1.5;"></i>
-          <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Nhiệm vụ Output thực tế</span>
-          <span class="pill pill-dark" style="font-size:10px;margin-left:auto;">BẮT BUỘC 1 TRONG 3</span>
-        </div>
-        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
-          Theo khoa học học tập, bạn <strong style="color:var(--text-primary);">phải chọn và thực hiện ít nhất 1 nhiệm vụ</strong> thì nút hoàn thành bài học mới mở:
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;" id="mission-list"></div>
-      </div>
-
-      <!-- Bottom Navigation Controls -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-bottom:16px;">
-        <button class="btn-secondary" onclick="changeDay(currentDayIndex - 1)" id="prev-btn">
-          <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Ngày trước
-        </button>
-        <button class="btn-primary" onclick="validateAndComplete()" id="complete-btn" style="padding:12px 24px;">
-          <i data-lucide="check-circle" style="width:17px;height:17px;"></i> Hoàn thành hôm nay
-        </button>
-        <button class="btn-secondary" onclick="changeDay(currentDayIndex + 1)" id="next-btn">
-          Ngày sau <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
-        </button>
       </div>
 
     </div>
@@ -821,6 +895,38 @@ const gateTestQuestions = [
 // 2. REAL DISCIPLINE & STREAK STATE (Bug 1 Fix)
 // ==========================================================
 let currentDayIndex = 0;
+
+// ==========================================================
+// FOCUS MODE STEP CONTROLLER (3-Step Flow)
+// ==========================================================
+let currentFocusStep = 1;
+
+function goToStep(stepNum) {
+  currentFocusStep = stepNum;
+  [1, 2, 3].forEach(s => {
+    const box = document.getElementById('focus-step-' + s);
+    const btn = document.getElementById('step-btn-' + s);
+    if (box) box.style.display = (s === stepNum) ? 'block' : 'none';
+    if (btn) {
+      if (s === stepNum) {
+        btn.className = 'btn-primary';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+      } else {
+        btn.className = 'btn-ghost';
+        btn.style.color = 'var(--text-secondary)';
+      }
+    }
+  });
+
+  if (stepNum === 2) {
+    switchPracticeTab(currentPracticeTab);
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  lucide.createIcons();
+}
+
 let userSelectedWords = [];
 let completedDays = JSON.parse(localStorage.getItem('hz90_completed') || '[]');
 let missionsDone = JSON.parse(localStorage.getItem('hz90_missions') || '{}');
@@ -969,7 +1075,7 @@ function renderLesson() {
   document.getElementById('hdr-day').textContent = cur.day;
   document.getElementById('hdr-title').textContent = cur.title;
   document.getElementById('hdr-topic').textContent = cur.topic;
-  document.getElementById('phonetic-tip-title').textContent = cur.phoneticTitle;
+  const pBadge = document.getElementById('phonetic-mini-badge'); if (pBadge) pBadge.textContent = cur.phoneticTitle.replace(':', '');
   document.getElementById('phonetic-tip-body').textContent = cur.phoneticTip;
 
   // Target sentence first (Top-down)
@@ -1034,12 +1140,17 @@ function renderDayTabs() {
   });
 }
 
+let visiblePyramidCount = 1;
+    goToStep(1);
+
 function renderPyramid(cur) {
   const cont = document.getElementById('pyramid-container');
   cont.innerHTML = '';
-  cur.pyramid.forEach((step, idx) => {
+  
+  for (let idx = 0; idx < visiblePyramidCount; idx++) {
+    const step = cur.pyramid[idx];
     const div = document.createElement('div');
-    div.className = 'pyramid-step';
+    div.className = 'pyramid-step fade-in';
     div.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#F5F6F8;flex-shrink:0;">
         <span style="font-size:11px;font-weight:700;color:var(--text-caption);">T${idx+1}</span>
@@ -1051,12 +1162,50 @@ function renderPyramid(cur) {
         </div>
         <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">→ ${step.vi}</div>
       </div>
-      <button onclick="playAudio('${step.zh.replace(/'/g, "\\'")}');" class="btn-ghost" style="padding:4px 8px;">
-        <i data-lucide="volume-2" style="width:15px;height:15px;"></i>
+      <button onclick="playAudio('${step.zh.replace(/'/g, "\\'")}');" class="btn-ghost" style="width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;" title="Nghe phát âm">
+        <i data-lucide="volume-2" style="width:16px;height:16px;"></i>
       </button>
     `;
     cont.appendChild(div);
-  });
+  }
+
+  // Downward expander button if not all levels are revealed
+  if (visiblePyramidCount < cur.pyramid.length) {
+    const expandRow = document.createElement('div');
+    expandRow.style.cssText = 'display:flex; justify-content:center; padding-top:8px;';
+    expandRow.innerHTML = `
+      <button onclick="expandPyramidStep()" class="btn-secondary" style="padding:6px 14px; font-size:12px; border-radius:999px; gap:6px; color:var(--accent); font-weight:600;">
+        <span>Mở tầng ${visiblePyramidCount + 1}</span>
+        <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+      </button>
+    `;
+    cont.appendChild(expandRow);
+  } else {
+    const collapseRow = document.createElement('div');
+    collapseRow.style.cssText = 'display:flex; justify-content:center; padding-top:6px;';
+    collapseRow.innerHTML = `
+      <button onclick="resetPyramidStep()" class="btn-ghost" style="padding:4px 10px; font-size:11px; color:var(--text-caption); gap:4px;">
+        <span>Thu gọn về Tầng 1</span>
+        <i data-lucide="chevron-up" style="width:12px;height:12px;"></i>
+      </button>
+    `;
+    cont.appendChild(collapseRow);
+  }
+  lucide.createIcons();
+}
+
+function expandPyramidStep() {
+  if (visiblePyramidCount < currentLesson.pyramid.length) {
+    visiblePyramidCount++;
+    renderPyramid(currentLesson);
+    playAudio(currentLesson.pyramid[visiblePyramidCount - 1].zh);
+  }
+}
+
+function resetPyramidStep() {
+  visiblePyramidCount = 1;
+    goToStep(1);
+  renderPyramid(currentLesson);
 }
 
 // Warmup with real SM-2 tracking
@@ -1124,6 +1273,9 @@ function resetPuzzle() {
   const cur = lessons[currentDayIndex];
   userSelectedWords = [];
   document.getElementById('puzzle-prompt').textContent = cur.puzzlePrompt;
+  const prPrompt = document.getElementById('practice-prompt'); if (prPrompt) prPrompt.textContent = cur.puzzlePrompt;
+  if (currentPracticeTab === 'type') initTypeExercise();
+  if (currentPracticeTab === 'speech') initSpeechExercise();
   const pool = document.getElementById('word-pool');
   pool.innerHTML = '';
 
@@ -1202,6 +1354,193 @@ function checkPuzzle() {
       ${cur.explanation}
     `;
     showToast('Chưa đúng trật tự — Hãy đọc giải thích bên dưới', 'error');
+  }
+}
+
+
+// ==========================================================
+// 6B. 3-STEP PRACTICE SUITE ENGINE
+// ==========================================================
+let currentPracticeTab = 'order';
+let speechRecognition = null;
+let isRecording = false;
+
+function switchPracticeTab(tab) {
+  currentPracticeTab = tab;
+  const tabs = ['order', 'type', 'speech'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('ptab-' + t);
+    const zone = document.getElementById('pzone-' + t);
+    if (t === tab) {
+      btn.className = 'pill pill-green';
+      btn.style.border = 'none';
+      if (zone) zone.style.display = 'block';
+    } else {
+      btn.className = 'pill pill-ghost';
+      btn.style.border = '1px solid var(--border)';
+      if (zone) zone.style.display = 'none';
+    }
+  });
+
+  const badge = document.getElementById('practice-badge');
+  if (tab === 'order') {
+    badge.textContent = 'Có từ gây nhiễu';
+    badge.className = 'pill pill-warn';
+  } else if (tab === 'type') {
+    badge.textContent = 'Luyện gõ WeChat';
+    badge.className = 'pill pill-dark';
+    initTypeExercise();
+  } else if (tab === 'speech') {
+    badge.textContent = 'Nhận diện giọng nói';
+    badge.className = 'pill pill-green';
+    initSpeechExercise();
+  }
+  lucide.createIcons();
+}
+
+function initTypeExercise() {
+  const cur = currentLesson;
+  document.getElementById('type-pinyin-hint').textContent = cur.pyramid[3].py;
+  document.getElementById('type-input').value = '';
+  document.getElementById('type-feedback').style.display = 'none';
+}
+
+function cleanZhText(str) {
+  return (str || '').replace(/[\s\.,?!。，？！、]/g, '').trim();
+}
+
+function checkTypeAnswer() {
+  const cur = currentLesson;
+  const userVal = document.getElementById('type-input').value;
+  const cleanUser = cleanZhText(userVal);
+  const cleanTarget = cleanZhText(cur.pyramid[3].zh);
+  const box = document.getElementById('type-feedback');
+  box.style.display = 'block';
+
+  if (cleanUser === cleanTarget) {
+    box.style.cssText = 'display:block;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
+    box.innerHTML = `
+      <strong style="display:block;font-size:14px;margin-bottom:4px;">🎉 Chính xác 100%!</strong>
+      Bạn đã gõ chuẩn chữ Hán: <span class="zh" style="font-weight:700;color:#111315;">${cur.pyramid[3].zh}</span>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Rất tốt! Phản xạ ngón tay gõ Pinyin ra chữ Hán này sẽ giúp bạn chat WeChat mượt mà.</div>
+    `;
+    playAudio(cur.pyramid[3].zh);
+    showToast('Gõ chữ Hán hoàn toàn chính xác! 🎯', 'success');
+  } else {
+    // Show diff
+    box.style.cssText = 'display:block;margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;';
+    box.innerHTML = `
+      <strong style="display:block;font-size:14px;margin-bottom:4px;">Chưa khớp hoàn toàn!</strong>
+      <div>Bạn đã gõ: <span class="zh" style="font-weight:600;color:#111315;">${userVal || '(chưa nhập)'}</span></div>
+      <div style="margin-top:4px;">Đáp án chuẩn: <span class="zh" style="font-weight:700;color:var(--accent);">${cur.pyramid[3].zh}</span></div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Hãy kiểm tra lại xem có chọn nhầm chữ Hán đồng âm khi gõ Pinyin không nhé.</div>
+    `;
+    showToast('Chưa khớp — Hãy xem câu đáp án chuẩn', 'error');
+  }
+}
+
+function initSpeechExercise() {
+  const cur = currentLesson;
+  document.getElementById('speech-target-text').textContent = cur.pyramid[3].zh;
+  document.getElementById('speech-target-py').textContent = cur.pyramid[3].py;
+  document.getElementById('speech-result-box').style.display = 'none';
+  document.getElementById('speech-listening-indicator').style.display = 'none';
+}
+
+function toggleSpeechRecording() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) {
+    showToast('Trình duyệt chưa hỗ trợ Web Speech API. Hãy mở bằng Chrome hoặc Edge!', 'error');
+    return;
+  }
+
+  if (isRecording) {
+    if (speechRecognition) speechRecognition.stop();
+    isRecording = false;
+    document.getElementById('speech-btn-label').textContent = 'Bấm để nói lại';
+    document.getElementById('speech-listening-indicator').style.display = 'none';
+    return;
+  }
+
+  try {
+    speechRecognition = new SpeechRec();
+    speechRecognition.lang = 'zh-CN';
+    speechRecognition.interimResults = false;
+    speechRecognition.maxAlternatives = 1;
+
+    speechRecognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('speech-btn-label').textContent = 'Đang ghi âm... (Bấm để dừng)';
+      document.getElementById('speech-listening-indicator').style.display = 'block';
+    };
+
+    speechRecognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      evaluateSpeech(transcript);
+    };
+
+    speechRecognition.onerror = (e) => {
+      isRecording = false;
+      document.getElementById('speech-btn-label').textContent = 'Bấm để nói lại';
+      document.getElementById('speech-listening-indicator').style.display = 'none';
+      if (e.error === 'not-allowed') {
+        showToast('Vui lòng cho phép quyền truy cập Micro trên trình duyệt!', 'error');
+      } else {
+        showToast('Chưa nghe rõ giọng nói. Hãy thử lại!', 'warn');
+      }
+    };
+
+    speechRecognition.onend = () => {
+      isRecording = false;
+      document.getElementById('speech-btn-label').textContent = 'Bấm để nói lại';
+      document.getElementById('speech-listening-indicator').style.display = 'none';
+    };
+
+    speechRecognition.start();
+  } catch (err) {
+    console.error(err);
+    showToast('Lỗi micro: ' + err.message, 'error');
+  }
+}
+
+function evaluateSpeech(transcript) {
+  const cur = currentLesson;
+  const cleanSpoken = cleanZhText(transcript);
+  const cleanTarget = cleanZhText(cur.pyramid[3].zh);
+  const box = document.getElementById('speech-result-box');
+  box.style.display = 'block';
+
+  // Calculate matching character count
+  let matchCount = 0;
+  for (const ch of cleanSpoken) {
+    if (cleanTarget.includes(ch)) matchCount++;
+  }
+  const maxLen = Math.max(cleanTarget.length, cleanSpoken.length, 1);
+  const score = Math.min(100, Math.round((matchCount / cleanTarget.length) * 100));
+
+  if (score >= 80) {
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#F0FDF4;border:1px solid #86EFAC;color:#15803D;';
+    box.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <strong style="font-size:15px;">🎉 Phát âm rất tốt!</strong>
+        <span class="pill pill-green" style="font-size:11px;">Độ chuẩn: ${score}%</span>
+      </div>
+      <div>AI bản địa nhận diện: <strong class="zh" style="font-size:16px;color:#111315;">"${transcript}"</strong></div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Giọng phát âm tự nhiên, người Hàng Châu nghe chắc chắn sẽ hiểu ngay!</div>
+    `;
+    showToast(`Xuất sắc! Điểm phát âm: ${score}% 🎙️`, 'success');
+  } else {
+    box.style.cssText = 'display:block;margin-top:12px;padding:14px;border-radius:12px;font-size:13px;line-height:1.6;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;';
+    box.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <strong style="font-size:14px;">Cần luyện thêm phát âm</strong>
+        <span class="pill pill-warn" style="font-size:11px;">Độ chuẩn: ${score}%</span>
+      </div>
+      <div>AI nghe thành: <strong class="zh" style="font-size:15px;color:#111315;">"${transcript || '(chưa rõ)'}"</strong></div>
+      <div style="margin-top:4px;">Câu chuẩn: <strong class="zh" style="color:var(--accent);">${cur.pyramid[3].zh}</strong></div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">💡 Hãy bấm nút 🔊 nghe lại mẫu, chú ý ngắt nghỉ đúng chỗ và đọc to hơn một chút nhé!</div>
+    `;
+    showToast(`Điểm phát âm: ${score}%. Hãy thử lại to hơn!`, 'warn');
   }
 }
 
@@ -1581,6 +1920,7 @@ window.addEventListener('DOMContentLoaded', () => {
   evaluateStreak();
   renderLesson();
   lucide.createIcons();
+  syncFromSupabase();
 });
 </script>
 </body>
