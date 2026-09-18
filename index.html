@@ -14,7 +14,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>✈️ HangzhouComing</title>
+  <title>HangzhouComing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- Pinned Lucide icons version to avoid breaking changes -->
@@ -1068,35 +1068,44 @@ function renderLesson() {
   const cur = lessons[currentDayIndex];
   window.currentLesson = cur;
 
-  document.getElementById('hdr-day').textContent = cur.day;
-  document.getElementById('hdr-title').textContent = cur.title;
-  document.getElementById('hdr-topic').textContent = cur.topic;
-  const pBadge = document.getElementById('phonetic-mini-badge'); if (pBadge) pBadge.textContent = cur.phoneticTitle.replace(':', '');
-  document.getElementById('phonetic-tip-body').textContent = cur.phoneticTip;
+  const setTxt = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+
+  setTxt('hdr-day', cur.day);
+  setTxt('hdr-title', cur.title);
+  setTxt('hdr-topic', cur.topic);
+  
+  const pBadge = document.getElementById('phonetic-mini-badge');
+  if (pBadge) pBadge.textContent = cur.phoneticTitle ? cur.phoneticTitle.replace(':', '') : 'Biến điệu';
+  setTxt('phonetic-tip-body', cur.phoneticTip);
 
   // Target sentence first (Top-down)
   const targetP = cur.pyramid[3];
-  document.getElementById('target-zh').textContent = targetP.zh;
-  document.getElementById('target-py').textContent = targetP.py;
-  document.getElementById('target-vi').textContent = targetP.vi;
+  setTxt('target-zh', targetP.zh);
+  setTxt('target-py', targetP.py);
+  setTxt('target-vi', targetP.vi);
 
   // Core word
-  document.getElementById('core-hanzi').textContent = cur.coreWord;
-  document.getElementById('core-pinyin').textContent = cur.corePinyin;
-  document.getElementById('core-meaning').textContent = cur.coreMeaning;
-  document.getElementById('core-mnemonic').textContent = cur.coreMnemonic;
+  setTxt('core-hanzi', cur.coreWord);
+  setTxt('core-pinyin', cur.corePinyin);
+  setTxt('core-meaning', cur.coreMeaning);
+  setTxt('core-mnemonic', cur.coreMnemonic);
 
   // Companion chips (Lộ trình 2 Fix)
   const compZone = document.getElementById('companion-chips');
-  compZone.innerHTML = '';
-  cur.companions.forEach(c => {
-    const chip = document.createElement('span');
-    chip.className = 'pill pill-ghost zh';
-    chip.style.cssText = 'font-size:12px;cursor:pointer;padding:4px 10px;text-transform:none;';
-    chip.innerHTML = `<span style="color:var(--text-primary);font-weight:600;">${c.zh}</span> <span style="color:var(--accent);font-size:11px;">(${c.py})</span>: ${c.vi}`;
-    chip.onclick = () => playAudio(c.zh);
-    compZone.appendChild(chip);
-  });
+  if (compZone) {
+    compZone.innerHTML = '';
+    cur.companions.forEach(c => {
+      const chip = document.createElement('span');
+      chip.className = 'pill pill-ghost zh';
+      chip.style.cssText = 'font-size:12px;cursor:pointer;padding:4px 10px;text-transform:none;';
+      chip.innerHTML = `<span style="color:var(--text-primary);font-weight:600;">${c.zh}</span> <span style="color:var(--accent);font-size:11px;">(${c.py})</span>: ${c.vi}`;
+      chip.onclick = () => playAudio(c.zh);
+      compZone.appendChild(chip);
+    });
+  }
 
   renderDayTabs();
   renderPyramid(cur);
@@ -1107,10 +1116,16 @@ function renderLesson() {
   lucide.createIcons();
 
   // Navigation button bounds
-  document.getElementById('prev-btn').disabled = currentDayIndex === 0;
-  document.getElementById('prev-btn').style.opacity = currentDayIndex === 0 ? '0.4' : '1';
-  document.getElementById('next-btn').disabled = currentDayIndex === lessons.length - 1;
-  document.getElementById('next-btn').style.opacity = currentDayIndex === lessons.length - 1 ? '0.4' : '1';
+  const prevBtn = document.getElementById('prev-btn');
+  if (prevBtn) {
+    prevBtn.disabled = currentDayIndex === 0;
+    prevBtn.style.opacity = currentDayIndex === 0 ? '0.4' : '1';
+  }
+  const nextBtn = document.getElementById('next-btn');
+  if (nextBtn) {
+    nextBtn.disabled = currentDayIndex === lessons.length - 1;
+    nextBtn.style.opacity = currentDayIndex === lessons.length - 1 ? '0.4' : '1';
+  }
 }
 
 function renderDayTabs() {
@@ -1207,6 +1222,7 @@ function resetPyramidStep() {
 // Warmup with real SM-2 tracking
 function renderWarmup() {
   const zone = document.getElementById('warmup-card-zone');
+  if (!zone) return;
   const due = getDueWords();
 
   if (currentDayIndex === 0) {
@@ -1641,23 +1657,27 @@ function changeDay(idx) {
 // 8. REAL STUDY PROGRESS & COUNTDOWN (UX 5 Fix)
 // ==========================================================
 function updateRealProgress() {
+  const setEl = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
   const target = new Date("2026-12-20T00:00:00");
   const now = new Date();
   const diffDays = Math.max(0, Math.ceil((target - now) / 86400000));
-  document.getElementById('countdown-days-badge').textContent = `${diffDays} ngày nữa`;
-  document.getElementById('mob-countdown-pill').textContent = `${diffDays} ngày ✈️`;
+  setEl('countdown-days-badge', `${diffDays} ngày nữa`);
+  setEl('mob-countdown-pill', `${diffDays} ngày ✈️`);
 
-  // Real progress: based on lessons completed
   const total = lessons.length;
   const done = completedDays.length;
   const pct = Math.round((done / total) * 100);
 
-  document.getElementById('progress-card-title').textContent = `Chặng 1: ${done}/${total} bài`;
-  document.getElementById('real-study-bar').style.width = pct + '%';
-  document.getElementById('study-pct-text').textContent = `${pct}% đã xong`;
+  setEl('progress-card-title', `Chặng 1: ${done}/${total} bài`);
+  const bar = document.getElementById('real-study-bar');
+  if (bar) bar.style.width = pct + '%';
+  setEl('study-pct-text', `${pct}% đã xong`);
 
   const due = getDueWords();
-  document.getElementById('due-vocab-text').textContent = `${due.length} từ cần ôn`;
+  setEl('due-vocab-text', `${due.length} từ cần ôn`);
 }
 
 // ==========================================================
