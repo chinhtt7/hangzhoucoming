@@ -5,8 +5,8 @@ import socket
 
 # 1. Streamlit Page Configuration
 st.set_page_config(
-    page_title="Hangzhou 90 — Tiếng Trung Tác Chiến",
-    page_icon="杭",
+    page_title="✈️ HangzhouComing",
+    page_icon="✈️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
