@@ -42,32 +42,52 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Get local IP for mobile access on same Wi-Fi
-def get_local_ip():
+# 3. Supabase Credentials Handling
+# Check st.secrets first, then fall back to session state / user input
+default_url = "https://wzuvtyjkrtrcygfouynu.supabase.co"
+default_key = "sb_publishable_ZL7gyl-nH2mvRcXXXE5Iew_lUsqdqfz"
+default_user = "chinhtt"
+
+try:
+    if hasattr(st, "secrets"):
+        default_url = st.secrets.get("SUPABASE_URL", "")
+        default_key = st.secrets.get("SUPABASE_KEY", "")
+        default_user = st.secrets.get("USER_ID", "chinhtt")
+except Exception:
+    pass
+
+supabase_url = default_url
+supabase_key = default_key
+user_id = default_user
+
+# 4. Streamlit Sidebar Controls & Supabase Configuration
+with st.sidebar:
+    st.markdown("### 杭 Hangzhou 90 Settings")
+    
+    with st.expander("☁️ Cấu hình Supabase Cloud Sync", expanded=not bool(supabase_url and supabase_key)):
+        st.caption("Nhập URL & Anon Key của Supabase để tự động đồng bộ tiến độ giữa Máy tính và Điện thoại:")
+        cfg_url = st.text_input("Supabase Project URL", value=supabase_url, placeholder="https://xyz.supabase.co")
+        cfg_key = st.text_input("Supabase Anon Key", value=supabase_key, type="password", placeholder="eyJhbGciOi...")
+        cfg_user = st.text_input("User ID (Tên định danh)", value=user_id)
+        
+        if cfg_url and cfg_key:
+            supabase_url = cfg_url
+            supabase_key = cfg_key
+            user_id = cfg_user
+            st.success("✅ Đã kết nối thông tin Supabase!")
+            
+    st.markdown("---")
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
+        local_ip = s.getsockname()[0]
         s.close()
-        return ip
     except Exception:
-        return "127.0.0.1"
-
-local_ip = get_local_ip()
-
-# 4. Optional Streamlit Sidebar for Utilities & Mobile Sync
-with st.sidebar:
-    st.markdown("### 杭 Hangzhou 90 Settings")
+        local_ip = "127.0.0.1"
     st.info(f"📱 **Mở trên điện thoại (Cùng Wi-Fi):**\n\n`http://{local_ip}:8501`")
-    
-    st.markdown("---")
-    st.markdown("#### ☁️ Triển khai Streamlit Cloud")
-    st.caption("Để mở app trên điện thoại mọi lúc mọi nơi mà không cần bật máy tính, bạn chỉ cần đưa folder này lên GitHub rồi kết nối với **share.streamlit.io** (hoàn toàn miễn phí).")
-    
-    st.markdown("---")
     st.caption("Hangzhou 90 Days • LOG-VR Design System Standard")
 
-# 5. Read and Render HTML Core App
+# 5. Read and Render HTML Core App with Supabase Injection
 current_dir = os.path.dirname(os.path.abspath(__file__))
 html_file_path = os.path.join(current_dir, "index.html")
 
@@ -75,7 +95,19 @@ if os.path.exists(html_file_path):
     with open(html_file_path, "r", encoding="utf-8") as f:
         html_content = f.read()
     
-    # Render component with responsive full-height viewport
+    # Inject Supabase Config if available
+    if supabase_url and supabase_key:
+        injection = f"""
+        <script>
+            window.SUPABASE_CONFIG = {{
+                url: "{supabase_url.strip()}",
+                key: "{supabase_key.strip()}",
+                userId: "{user_id.strip()}"
+            }};
+        </script>
+        """
+        html_content = html_content.replace("<head>", f"<head>\n{injection}")
+    
     components.html(html_content, height=1050, scrolling=True)
 else:
     st.error(f"Không tìm thấy file index.html tại: {html_file_path}")
